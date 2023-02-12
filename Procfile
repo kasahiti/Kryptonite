@@ -1,0 +1,1 @@
+web: node frontend/scripts/heroku-start.js
