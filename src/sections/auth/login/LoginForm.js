@@ -64,7 +64,7 @@ export default function LoginForm() {
         role: ['user']}
     );
 
-    axios.post('https://Kryptonite-backend.adron.ch/api/auth/signup', data, {
+    axios.post('https://krypto-backend.adron.ch/api/auth/signup', data, {
       headers: {
         'Content-Type': 'application/json'
       }

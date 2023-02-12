@@ -22,7 +22,7 @@ if (localStorage.getItem("user") === null) {
 
 const UserContext = createContext(localStorage.getItem('user'));
 
-const baseAPI = "https://kryptonite-backend.adron.ch/api";
+const baseAPI = "https://krypto-backend.adron.ch/api";
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
