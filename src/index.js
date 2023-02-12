@@ -17,7 +17,7 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (localStorage.getItem("user") === null) {
-  localStorage.setItem('user', JSON.stringify({name: '', auth: false}));
+  localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: ''}));
 }
 
 const UserContext = createContext(localStorage.getItem('user'));
@@ -27,18 +27,27 @@ const baseAPI = "https://krypto-backend.adron.ch/api";
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
-  const login = (name, pass) => {
-    const json = JSON.stringify({username: name, password: pass});
+  const clearUser = () => {
+    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: ''}));
 
-    return axios.post(`${baseAPI}/auth/signin`, json, {
-      withCredentials: true,
+    setUser({
+      email: '',
+      password: '',
+      auth: false,
+    });
+  }
+
+  const login = (email, pass) => {
+    const json = JSON.stringify({email, password: pass});
+
+    return axios.post(`${baseAPI}/auth/login`, json, {
       headers: {
         'Content-Type': 'application/json'
       }
     })
-      .then(() => {
-        setUser({name, auth: true});
-        localStorage.setItem('user', JSON.stringify({name, auth: true}));
+      .then((response) => {
+        setUser({email, auth: true, token: response.data.token});
+        localStorage.setItem('user', JSON.stringify({email, auth: true, token: response.data.token}));
         return true;
       })
       .catch(() => false);
@@ -46,20 +55,7 @@ const UserProvider = ({ children }) => {
 
   // Logout updates the user data to default
   const logout = () => {
-    axios.post(`${baseAPI}/auth/signout`, {
-      withCredentials: true,
-    })
-      .then(response => {
-        console.log(response.data)
-        setUser({name: '', auth: false});
-        localStorage.setItem('user', JSON.stringify({name: '', auth: false}));
-      })
-
-    setUser({
-      name: '',
-      password: '',
-      auth: false,
-    });
+    clearUser();
   };
 
   const changePassword = (newPassword) => {

@@ -59,12 +59,12 @@ export default function LoginForm() {
   const handleRegistration = () => {
     const data = JSON.stringify(
       {
-        username: userForm,
-        password,
-        role: ['user']}
+        email: userForm,
+        password
+      }
     );
 
-    axios.post('https://krypto-backend.adron.ch/api/auth/signup', data, {
+    axios.post('https://krypto-backend.adron.ch/api/auth/register', data, {
       headers: {
         'Content-Type': 'application/json'
       }
