@@ -23,49 +23,48 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-  @Value("${spring.h2.console.path}")
-  private String h2Console;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+    @Value("${spring.h2.console.path}")
+    private String h2Console;
 
-  private final JwtAuthenticationFilter jwtAuthFilter;
-  private final AuthenticationProvider authenticationProvider;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .authorizeHttpRequests()
+                .requestMatchers("/api/**")
+                .permitAll()
+                .requestMatchers("/")
+                .permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher(h2Console + "/**"))
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .cors()
-        .and()
-        .csrf()
-        .disable()
-        .authorizeHttpRequests()
-        .requestMatchers("/api/auth/**")
-        .permitAll()
-        .requestMatchers("/")
-        .permitAll()
-        .requestMatchers(AntPathRequestMatcher.antMatcher(h2Console + "/**"))
-        .permitAll()
-        .anyRequest()
-        .authenticated()
-        .and()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        http.headers().frameOptions().disable();
+        return http.build();
+    }
 
-    http.headers().frameOptions().disable();
-    return http.build();
-  }
-
-  @Bean
-  CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://kryptonite-front.herokuapp.com/", "https://krypto-backend.adron.ch/", "null"));
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-    configuration.setAllowCredentials(true);
-    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-    configuration.setExposedHeaders(List.of("Authorization"));
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
-    return source;
-  }
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://kryptonite-front.herokuapp.com/", "https://krypto-backend.adron.ch/", "null"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

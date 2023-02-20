@@ -1,5 +1,6 @@
 package ch.hesge.kryptonite.payload.request;
 
+import ch.hesge.kryptonite.domain.Language;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest {
-
-    String password;
-    private String email;
+public class AssessmentRequest {
+    private String name;
+    private Language language;
 }

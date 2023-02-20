@@ -20,6 +20,7 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import DashboardAppPage from './pages/DashboardAppPage';
 import UserContext from './index';
+import UploadPage from "./pages/UploadPage";
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +47,7 @@ export default function App() {
             <Route exact path="compte" element={<UserPage />} />
           </Route>
         </Route>
+        <Route path="/assessment/:uuid" element={<UploadPage />} />
         <Route exact path="login" element={<LoginPage />} />
         <Route element={<SimpleLayout />} >
           <Route element={<Navigate to="/app/dashboard" />} index />

@@ -19,5 +19,14 @@ spring:
     database: h2
     database-platform: org.hibernate.dialect.H2Dialect
     defer-datasource-initialization: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 server:
-  port: 8080
+  port: 8181
+jwt:
+  secret: 7E5YbJQVfA8nX9cxRpM4LdHgwK6DkZioLTru2P0hNtSsmW1UzvOGCqIe3lKFj # Change this in production !
+kryptonite:
+  user: root
+  password: Kryptonite321!
