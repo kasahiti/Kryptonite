@@ -1,15 +1,10 @@
 package ch.hesge.kryptonite.controllers;
 
-import ch.hesge.kryptonite.domain.Assessment;
 import ch.hesge.kryptonite.domain.StudentProject;
-import ch.hesge.kryptonite.domain.User;
-import ch.hesge.kryptonite.repositories.AssessmentRepository;
 import ch.hesge.kryptonite.repositories.StudentProjectRepository;
-import ch.hesge.kryptonite.services.AssessmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

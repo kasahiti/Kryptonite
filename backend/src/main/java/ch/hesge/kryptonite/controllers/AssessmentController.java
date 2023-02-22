@@ -35,9 +35,4 @@ public class AssessmentController {
         assessments.forEach(System.out::println);
         return ResponseEntity.ok().body(assessments);
     }
-
-    @GetMapping("hello")
-    public String sayHello() {
-        return "Hello !";
-    }
 }
