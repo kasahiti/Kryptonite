@@ -16,16 +16,18 @@ public class AssessmentService {
     private final AssessmentRepository assessmentRepository;
     private final UserRepository userRepository;
 
-    public void register(AssessmentRequest request, User tmp) {
+    public String register(AssessmentRequest request, User tmp) {
         var user = userRepository.findByEmail(tmp.getEmail()).orElseThrow();
-        System.out.println(request);
+        var uuid = String.valueOf(UUID.randomUUID());
         var assessment = Assessment.builder()
                 .name(request.getName())
                 .language(request.getLanguage())
                 .user(user)
-                .uuid(String.valueOf(UUID.randomUUID()))
+                .uuid(uuid)
+                .correction(request.getCorrection())
                 .build();
 
         assessmentRepository.save(assessment);
+        return uuid;
     }
 }

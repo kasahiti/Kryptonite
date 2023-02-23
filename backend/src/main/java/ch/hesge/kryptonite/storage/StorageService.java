@@ -21,5 +21,6 @@ public interface StorageService {
 
     void createIfNotExist(String subdirectory);
 
-    void createCheck50Dir(String checkName, String checkData);
+
+    public void createCheck50Dir(String uuid, String checkData);
 }

@@ -2,7 +2,6 @@ package ch.hesge.kryptonite.jobs;
 
 import ch.hesge.kryptonite.domain.StudentProject;
 import ch.hesge.kryptonite.repositories.StudentProjectRepository;
-import ch.hesge.kryptonite.services.AssessmentService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class JobScheduler {
     public void startCorrection() {
         log.info("The time is now {}", date.format(new Date()));
         List<StudentProject> projects = repository.findByStatus(JobStatus.NOT_STARTED).get();
-        if (projects.size() > 0) {
+        if (!projects.isEmpty()) {
             StudentProject project = projects.get(0);
             project.setStatus(JobStatus.STARTED);
             repository.save(project);

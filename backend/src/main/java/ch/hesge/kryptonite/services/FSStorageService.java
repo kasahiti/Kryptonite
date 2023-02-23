@@ -110,7 +110,16 @@ public class FSStorageService implements StorageService {
     }
 
     @Override
-    public void createCheck50Dir(String checkName, String checkData) {
+    public void createCheck50Dir(String uuid, String checkData) {
+        try {
+            Path check50Path = Path.of(rootLocation + "/" + uuid + "/" + "check50");
 
+            InputStream inputStream = Objects.requireNonNull(FSStorageService.class.getClassLoader().getResourceAsStream(".cs50.yml"));
+            Files.createDirectories(check50Path);
+            Files.writeString(Path.of(check50Path + "/__init__.py"), checkData);
+            Files.write(Path.of(check50Path + "/.cs50.yml"), inputStream.readAllBytes());
+        } catch (IOException e) {
+            throw new StorageException("Could not initialize storage", e);
+        }
     }
 }

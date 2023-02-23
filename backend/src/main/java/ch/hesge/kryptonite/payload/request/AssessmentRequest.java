@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class AssessmentRequest {
     private String name;
     private Language language;
+    private String correction;
 }
