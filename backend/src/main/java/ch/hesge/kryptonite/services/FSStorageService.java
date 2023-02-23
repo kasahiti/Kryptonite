@@ -31,14 +31,17 @@ public class FSStorageService implements StorageService {
     }
 
     @Override
-    public void store(MultipartFile file) {
+    public void store(MultipartFile file, String uuid, String subPath) {
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
-            Path destinationFile = this.rootLocation.resolve(
+            createIfNotExist(uuid + "/" + subPath);
+            Path newRootPath = Path.of(rootLocation + "/" + uuid + "/" + subPath);
+
+            Path destinationFile = newRootPath.resolve(
                     Paths.get(Objects.requireNonNull(file.getOriginalFilename()))).normalize().toAbsolutePath();
-            if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+            if (!destinationFile.getParent().equals(newRootPath.toAbsolutePath())) {
                 // Security check
                 throw new StorageException("Cannot store file outside current directory.");
             }
@@ -104,5 +107,10 @@ public class FSStorageService implements StorageService {
         } catch (IOException e) {
             throw new StorageException("Could not initialize storage", e);
         }
+    }
+
+    @Override
+    public void createCheck50Dir(String checkName, String checkData) {
+
     }
 }

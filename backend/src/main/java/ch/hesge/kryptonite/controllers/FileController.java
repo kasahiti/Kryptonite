@@ -37,17 +37,17 @@ public class FileController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("uuid") String uuid,
             @RequestParam("firstName") String firstName,
-            @RequestParam("lastName") String lastName
-    ) {
-        Assessment assessment = assessmentRepository.findByUuid(uuid).get();
+            @RequestParam("lastName") String lastName) {
+        Assessment assessment = assessmentRepository.findByUuid(uuid).orElseThrow();
         StudentProject project = StudentProject.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .status(JobStatus.NOT_STARTED)
                 .assessment(assessment)
+                .fileName(file.getName())
                 .build();
         studentRepository.save(project);
-        storageService.store(file);
+        storageService.store(file, uuid, firstName+"_"+lastName);
         return ResponseEntity.ok().body("File uploaded successfully");
     }
 

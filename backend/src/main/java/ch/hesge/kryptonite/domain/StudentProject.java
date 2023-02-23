@@ -22,6 +22,8 @@ public class StudentProject {
     @JoinColumn(name = "assessment_id", nullable = false)
     private Assessment assessment;
 
+    private String fileName;
+
     private String firstName;
     private String lastName;
 
