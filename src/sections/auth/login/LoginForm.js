@@ -120,10 +120,6 @@ export default function LoginForm() {
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}/>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-        <LoadingButton size="large" type="submit" variant="outlined" onClick={handleRegistration}>
-          S'inscrire
-        </LoadingButton>
-
         <LoadingButton size="large" type="submit" variant="contained" onClick={handleClick}>
           Se connecter
         </LoadingButton>
