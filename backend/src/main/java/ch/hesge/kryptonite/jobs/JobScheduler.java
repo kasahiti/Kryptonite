@@ -1,8 +1,6 @@
 package ch.hesge.kryptonite.jobs;
 
-import ch.hesge.kryptonite.domain.Assessment;
 import ch.hesge.kryptonite.domain.StudentProject;
-import ch.hesge.kryptonite.repositories.AssessmentRepository;
 import ch.hesge.kryptonite.repositories.StudentProjectRepository;
 import ch.hesge.kryptonite.utils.TerminalRunner;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +22,11 @@ public class JobScheduler {
 
     @Scheduled(fixedRate = 20000)
     public void startCorrection() {
-        log.info("The time is now {}", date.format(new Date()));
+        log.info("Performing automatic checks at {}", date.format(new Date()));
+
         List<StudentProject> projects = repository.findByStatus(JobStatus.NOT_STARTED).get();
         if (!projects.isEmpty()) {
+            log.info("There is work to do !");
             StudentProject project = projects.get(0);
             project.setStatus(JobStatus.STARTED);
             repository.save(project);
@@ -37,6 +37,7 @@ public class JobScheduler {
                     "--dev", project.getAssessment().getCheck50DataPath(),
                     "-o", "json"
             );
+
             project.setJsonResults(output);
             project.setStatus(JobStatus.DONE);
             repository.save(project);
