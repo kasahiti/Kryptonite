@@ -35,7 +35,7 @@ public class Assessment {
 
     private Language language;
     private String name;
-
     private String correction;
+    private String check50DataPath;
 
 }

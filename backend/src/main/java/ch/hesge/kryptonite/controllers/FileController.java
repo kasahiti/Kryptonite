@@ -39,16 +39,18 @@ public class FileController {
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName) {
         Assessment assessment = assessmentRepository.findByUuid(uuid).orElseThrow();
+
+        String path = String.valueOf(storageService.store(file, uuid, firstName+"_"+lastName));
         StudentProject project = StudentProject.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .status(JobStatus.NOT_STARTED)
                 .assessment(assessment)
-                .fileName(file.getName())
+                .pathFS(path)
                 .build();
         studentRepository.save(project);
-        storageService.store(file, uuid, firstName+"_"+lastName);
-        return ResponseEntity.ok().body("File uploaded successfully");
+
+        return ResponseEntity.ok().body("File uploaded successfully!");
     }
 
     @ExceptionHandler(StorageFileNotFoundException.class)

@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public interface StorageService {
     void init();
 
-    void store(MultipartFile file, String uuid, String subPath);
+    Path store(MultipartFile file, String uuid, String subPath);
 
     Stream<Path> loadAll();
 
@@ -22,5 +22,5 @@ public interface StorageService {
     void createIfNotExist(String subdirectory);
 
 
-    public void createCheck50Dir(String uuid, String checkData);
+    Path createCheck50Dir(String uuid, String checkData);
 }

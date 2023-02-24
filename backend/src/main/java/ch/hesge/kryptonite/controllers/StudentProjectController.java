@@ -21,7 +21,6 @@ public class StudentProjectController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<StudentProject>> getAllProjects() {
         List<StudentProject> projects = repository.findAll();
-        projects.forEach(System.out::println);
         return ResponseEntity.ok().body(projects);
     }
 }

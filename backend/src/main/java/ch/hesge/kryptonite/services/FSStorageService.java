@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 @Service
 public class FSStorageService implements StorageService {
+
     private final Path rootLocation;
 
     @Autowired
@@ -31,24 +32,24 @@ public class FSStorageService implements StorageService {
     }
 
     @Override
-    public void store(MultipartFile file, String uuid, String subPath) {
+    public Path store(MultipartFile file, String uuid, String subPath) {
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
             createIfNotExist(uuid + "/" + subPath);
-            Path newRootPath = Path.of(rootLocation + "/" + uuid + "/" + subPath);
 
+            Path newRootPath = Path.of(rootLocation + "/" + uuid + "/" + subPath);
             Path destinationFile = newRootPath.resolve(
-                    Paths.get(Objects.requireNonNull(file.getOriginalFilename()))).normalize().toAbsolutePath();
-            if (!destinationFile.getParent().equals(newRootPath.toAbsolutePath())) {
-                // Security check
-                throw new StorageException("Cannot store file outside current directory.");
-            }
+                    Paths.get(Objects.requireNonNull(file.getOriginalFilename())))
+                    .normalize()
+                    .toAbsolutePath();
+
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
             }
+            return newRootPath;
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }
@@ -110,7 +111,7 @@ public class FSStorageService implements StorageService {
     }
 
     @Override
-    public void createCheck50Dir(String uuid, String checkData) {
+    public Path createCheck50Dir(String uuid, String checkData) {
         try {
             Path check50Path = Path.of(rootLocation + "/" + uuid + "/" + "check50");
 
@@ -118,6 +119,8 @@ public class FSStorageService implements StorageService {
             Files.createDirectories(check50Path);
             Files.writeString(Path.of(check50Path + "/__init__.py"), checkData);
             Files.write(Path.of(check50Path + "/.cs50.yml"), inputStream.readAllBytes());
+
+            return check50Path;
         } catch (IOException e) {
             throw new StorageException("Could not initialize storage", e);
         }

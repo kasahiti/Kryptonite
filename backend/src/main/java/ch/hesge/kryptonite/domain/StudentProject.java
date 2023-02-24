@@ -1,6 +1,7 @@
 package ch.hesge.kryptonite.domain;
 
 import ch.hesge.kryptonite.jobs.JobStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,13 +21,14 @@ public class StudentProject {
     @ToString.Exclude
     @ManyToOne(optional = false)
     @JoinColumn(name = "assessment_id", nullable = false)
+    @JsonIgnore
     private Assessment assessment;
 
-    private String fileName;
+    @Lob
+    private String jsonResults;
 
     private String firstName;
     private String lastName;
-
     private JobStatus status;
-    private String jsonResults;
+    private String pathFS;
 }

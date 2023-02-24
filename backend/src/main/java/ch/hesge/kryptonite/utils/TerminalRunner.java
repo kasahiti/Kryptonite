@@ -11,24 +11,34 @@ import java.util.List;
 public class TerminalRunner {
     private TerminalRunner() { }
 
-    public static void shell(String command, String path, String... args) {
+    public static String shell(String command, String studentProjectPath, String... args) {
         List<String> commandList = new ArrayList<>();
         commandList.add(command);
         commandList.addAll(Arrays.asList(args));
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(commandList);
-        processBuilder.directory(new File(path));
-        processBuilder.inheritIO();
+        processBuilder.directory(new File(studentProjectPath));
+
+        var builder = new StringBuilder();
+        String line;
 
         try {
             Process process = processBuilder.start();
-            int exit = process.waitFor();
-            if (exit == 0) {
-                System.out.println("Success");
+            var reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+                builder.append(System.getProperty("line.separator"));
             }
+
+            process.waitFor();
+            process.destroy();
         } catch (IOException | InterruptedException e) {
             System.err.println(e);
+            return null;
         }
+
+        return builder.toString();
     }
 }
