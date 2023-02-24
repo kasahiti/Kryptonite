@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Java class used to represent an registration request from an admin.
+ */
 @Data
 @Builder
 @AllArgsConstructor

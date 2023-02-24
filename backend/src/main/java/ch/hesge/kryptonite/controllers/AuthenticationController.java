@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+/**
+ * REST controller that handles HTTP requests for user authentication and registration.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -22,6 +26,12 @@ public class AuthenticationController {
 
     private final UserRepository userRepository;
 
+
+    /**
+     * HTTP endpoint for registering a new user.
+     * @param request the RegisterRequest
+     * @return a ResponseEntity
+     */
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -30,6 +40,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.register(request, Role.ROLE_USER));
     }
 
+    /**
+     * HTTP endpoint for authenticating a user.
+     * @param request the AuthenticationRequest
+     * @return a ResponseEntity
+     */
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));

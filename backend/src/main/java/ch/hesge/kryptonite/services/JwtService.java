@@ -15,9 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Spring service that provides methods for managing JWT tokens.
+ */
 @Service
 public class JwtService {
 
+    // Get secret key from application.properties
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 

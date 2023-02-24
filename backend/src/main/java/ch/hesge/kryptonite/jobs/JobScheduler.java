@@ -13,6 +13,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+
+/**
+ * A Spring component that performs automatic checks on student projects at a fixed rate.
+ */
 @Component
 @RequiredArgsConstructor
 public class JobScheduler {
@@ -20,6 +24,12 @@ public class JobScheduler {
     private final Logger log = LoggerFactory.getLogger(JobScheduler.class);
     private final SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 
+
+    /**
+     * A scheduled method that performs automatic checks on student projects at a fixed rate.
+     * Retrieve all student projects with JobStatus=NOT_STARTED. If there's any, takes the first, and perform check50
+     * on it, stores the json result in it, changes the status and save the changes using the repository
+     */
     @Scheduled(fixedRate = 20000)
     public void startCorrection() {
         log.info("Performing automatic checks at {}", date.format(new Date()));

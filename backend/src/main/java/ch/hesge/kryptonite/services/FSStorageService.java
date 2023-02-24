@@ -21,16 +21,31 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+
+/**
+ * Spring service that provides methods for interacting with a File System.
+ */
 @Service
 public class FSStorageService implements StorageService {
 
     private final Path rootLocation;
 
+    /**
+     * Constructor of FSStorageService. It sets the root location to the root path defined in StorageProperties
+     */
     @Autowired
     public FSStorageService(StorageProperties properties) {
         this.rootLocation = Paths.get(properties.getLocation());
     }
 
+    /**
+     * Stores a file in the specified subdirectory within the location specified
+     * @param file the multipart file to store
+     * @param uuid the UUID of the file
+     * @param subPath the subdirectory within the root location to store the file
+     * @return the final path where the file was stored
+     * @throws StorageException if the file is empty or if an error occurs while storing the file
+     */
     @Override
     public Path store(MultipartFile file, String uuid, String subPath) {
         try {
@@ -55,6 +70,11 @@ public class FSStorageService implements StorageService {
         }
     }
 
+    /**
+     * Returns a stream of paths to all files stored at the location specified by the StorageProperties object.
+     * @return a stream of paths to all stored files
+     * @throws StorageException if an error occurs while reading stored files
+     */
     @Override
     public Stream<Path> loadAll() {
         try {
@@ -67,11 +87,22 @@ public class FSStorageService implements StorageService {
 
     }
 
+    /**
+     * Load and return a path to the specified filename
+     * @param filename the file to load
+     * @return
+     */
     @Override
     public Path load(String filename) {
         return rootLocation.resolve(filename);
     }
 
+    /**
+     * Returns a Resource representing a specific file
+     * @param filename the name of the file to load
+     * @return a Resource representing the specified file
+     * @throws StorageFileNotFoundException if the specified file cannot be read
+     */
     @Override
     public Resource loadAsResource(String filename) {
         try {
@@ -87,11 +118,17 @@ public class FSStorageService implements StorageService {
         }
     }
 
+    /**
+     * Deletes all files and directories in rootLocation
+     */
     @Override
     public void deleteAll() {
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 
+    /**
+     * Attempts to create root directory if it doesn't exist
+     */
     @Override
     public void init() {
         try {
@@ -101,6 +138,9 @@ public class FSStorageService implements StorageService {
         }
     }
 
+    /**
+     * Attempts to create all subdirectories inside root directory if they don't exist
+     */
     @Override
     public void createIfNotExist(String subdirectory) {
         try {
@@ -110,6 +150,13 @@ public class FSStorageService implements StorageService {
         }
     }
 
+    /**
+     * Creates the check50 directory inside the assessment directory. It also creates necessary files for check50, like
+     * __init__.py and .cs50.yml files.
+     * @param uuid uuid of the assessment
+     * @param checkData check data, more specifically python file containing all checks for the referenced assessment
+     * @return Path to the check50 folder
+     */
     @Override
     public Path createCheck50Dir(String uuid, String checkData) {
         try {

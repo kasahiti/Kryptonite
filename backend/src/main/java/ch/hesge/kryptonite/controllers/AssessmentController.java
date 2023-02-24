@@ -14,6 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+
+/**
+ * REST controller that handles HTTP requests for creating and retrieving assessments.
+ */
 @RestController
 @RequestMapping("/api/assessments")
 @RequiredArgsConstructor
@@ -22,6 +26,15 @@ public class AssessmentController {
     private final AssessmentService service;
     private final AssessmentRepository repository;
 
+
+    /**
+     * Endpoint for creating assessments
+     * @param name name of the assessment
+     * @param language language of the assessment
+     * @param file correction file for the assessment
+     * @return a ResponseEntity
+     * @throws IOException if an IO problem arises
+     */
     @PostMapping()
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<String> createAssessment(
@@ -34,6 +47,10 @@ public class AssessmentController {
         return ResponseEntity.ok().body("Assessment created!");
     }
 
+    /**
+     * Endpoint for retrieving assessments for logged-in user
+     * @return a ResponseEntity containing a list of Assessments
+     */
     @GetMapping()
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<List<Assessment>> getMyAssessments() {

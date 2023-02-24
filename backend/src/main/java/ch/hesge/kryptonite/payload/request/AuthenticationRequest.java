@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/**
+ * Java class used to represent an authentication request from a user.
+ */
 @Data
 @Builder
 @AllArgsConstructor

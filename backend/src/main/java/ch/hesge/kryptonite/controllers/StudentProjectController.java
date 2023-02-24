@@ -11,12 +11,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
+/**
+ * A REST controller that handles HTTP requests for student projects.
+ */
 @RestController
 @RequestMapping("/api/students")
 @RequiredArgsConstructor
 public class StudentProjectController {
     private final StudentProjectRepository repository;
 
+
+    /**
+     * HTTP endpoint for retrieving all student projects.
+     * @return a ResponseEntity containing all student projects
+     */
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<StudentProject>> getAllProjects() {

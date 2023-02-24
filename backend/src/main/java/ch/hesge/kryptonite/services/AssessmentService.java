@@ -13,6 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Spring service that provides a method for registering a new assessment.
+ */
 @Service
 @RequiredArgsConstructor
 public class AssessmentService {
@@ -20,6 +23,15 @@ public class AssessmentService {
     private final UserRepository userRepository;
     private final StorageService storageService;
 
+    /**
+     * Creates new assessment entity. This method also creates a directory for the assessment's check50 data and
+     * stores the correction in that directory.
+     * @param name The name of the assessment.
+     * @param language The language of the assessment.
+     * @param file A File containing the correction string for the assessment.
+     * @param tmp A User representing the user who is registering the assessment.
+     * @throws IOException If an I/O error occurs.
+     */
     public void register(String name, String language, MultipartFile file, User tmp) throws IOException {
         var user = userRepository.findByEmail(tmp.getEmail()).orElseThrow();
         var uuid = String.valueOf(UUID.randomUUID());

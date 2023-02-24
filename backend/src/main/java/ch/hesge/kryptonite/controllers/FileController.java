@@ -15,6 +15,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
+/**
+ * A REST controller that handles HTTP requests for file storage and retrieval.
+ */
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
@@ -23,6 +27,12 @@ public class FileController {
     private final StudentProjectRepository studentRepository;
     private final AssessmentRepository assessmentRepository;
 
+
+    /**
+     * HTTP endpoint for downloading a file.
+     * @param filename the name of the file to download
+     * @return a ResponseEntity containing the file as a Resource
+     */
     @GetMapping("/{filename:.+}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
@@ -32,6 +42,15 @@ public class FileController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
+
+    /**
+     * HTTP endpoint for uploading a file.
+     * @param file the uploaded file
+     * @param uuid the UUID associated with the file
+     * @param firstName the first name of the student
+     * @param lastName the last name of the student
+     * @return a ResponseEntity
+     */
     @PostMapping("/")
     public ResponseEntity<String> handleFileUpload(
             @RequestParam("file") MultipartFile file,
@@ -53,6 +72,12 @@ public class FileController {
         return ResponseEntity.ok().body("File uploaded successfully!");
     }
 
+
+    /**
+     * Exception handler for when a requested file is not found.
+     * @param exc the exception thrown when a file is not found
+     * @return a ResponseEntity with a 404 Not Found status
+     */
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ResponseEntity.notFound().build();
