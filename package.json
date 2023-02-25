@@ -54,6 +54,7 @@
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
     "numeral": "^2.0.6",
+    "prismjs": "^1.29.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.0",
@@ -62,6 +63,7 @@
     "react-hook-form": "^7.37.0",
     "react-router-dom": "^6.4.2",
     "react-scripts": "^5.0.1",
+    "react-simple-code-editor": "^0.13.1",
     "simplebar-react": "^2.4.3",
     "web-vitals": "^3.0.3"
   },
