@@ -15,12 +15,12 @@ const navConfig = [
     {
         title: 'Créer evaluation',
         path: '/app/assessment',
-        icon: icon('projets', 'png'),
+        icon: icon('creereval', 'png'),
     },
     {
         title: 'Mes évaluations',
         path: '/app/evaluations',
-        icon: icon('projets', 'png'),
+        icon: icon('evaluation', 'png'),
     },
     {
         title: 'Administration',

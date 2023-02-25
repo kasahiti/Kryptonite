@@ -110,6 +110,7 @@ export default function AdministrationPage() {
         setSelected([]);
     };
 
+
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];

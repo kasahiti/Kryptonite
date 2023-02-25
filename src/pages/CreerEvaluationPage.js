@@ -2,55 +2,131 @@ import {Helmet} from 'react-helmet-async';
 
 // @mui
 import {
+    Box,
     Button,
     Container,
     FormControl, FormControlLabel, FormGroup,
     Grid,
     InputLabel,
     MenuItem,
-    Select,
+    Select, Snackbar,
     Stack, Switch,
     TextField,
     Typography
 } from '@mui/material';
 
+import MuiAlert from '@mui/material/Alert';
+
 import {styled} from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-import {useContext, useState} from "react";
+import {createRef, forwardRef, useContext, useState} from "react";
 
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism.css';
+import axios from "axios";
 import UserContext from "../index";
 
 // ----------------------------------------------------------------------
 
-const Item = styled(Paper)(({theme}) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
+const Alert = forwardRef((props, ref) => {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const defaultCode = `import check50\nimport check50_java\n\n@check50.check()\ndef prints_hello():\n    """hello world"""\n    check50.run("python3 hello.py").stdout("Hello, world!", regex=False).exit(0)\n`
 
 export default function CreerEvaluationPage() {
-    const { user } = useContext(UserContext);
+    const { user, baseAPI } = useContext(UserContext);
     const [evalName, setEvalName] = useState("");
     const [language, setLanguage] = useState("");
     const [fileSwitch, setFileSwitch] = useState(false);
-    const [file, setFile] = useState(false);
+    const [file, setFile] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [severity, setSeverity] = useState("success");
+    const [msg, setMsg] = useState("This is a message");
+    const [evalUrl, setEvalUrl] = useState("");
+    const fileInput = createRef();
 
     const [code, setCode] = useState(
-        `import check50\nimport check50_java\n\n@check50.check()\ndef prints_hello():\n    """hello world"""\n    check50.run("python3 hello.py").stdout("Hello, world!", regex=False).exit(0)\n`
+        defaultCode
     );
+
+    const openSnack = (severity, message) => {
+        setSeverity(severity);
+        setMsg(message);
+        setOpen(true);
+    };
+
+    const closeSnack = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpen(false);
+    };
+
 
     const handleFileChange = (e) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
+            console.log(file);
         }
     };
+
+    const reset = () => {
+        setEvalName("");
+        setLanguage("");
+        setFileSwitch(false);
+        setFile(null);
+        setCode(defaultCode);
+        setOpen(false);
+        setEvalUrl("");
+    }
+
+    const verifyFields = () => {
+        if(evalName.length > 0 && language.length > 0 && (code.length > 0 || file != null)) {
+            createAssessment();
+        } else {
+            openSnack("error", "Il manque des champs obligatoires !")
+        }
+    }
+
+    const createAssessment = async () => {
+        const formData = new FormData();
+        formData.append('name', evalName);
+        formData.append('language', language.toUpperCase());
+
+        if (fileSwitch) {
+            if(file) {
+                formData.append('correction', file);
+            }
+        } else {
+            const pythonFile = new File([code], "correction.py", { type: 'text/plain' });
+            formData.append('correction', pythonFile);
+        }
+
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${baseAPI}/assessments`,
+            headers: {
+                'Authorization': `Bearer ${user.token}`,
+            },
+            data : formData
+        };
+
+        axios(config)
+            .then((response) => {
+                openSnack("success", "Evaluation créée");
+                setEvalUrl(`${window.location.protocol}//${window.location.host}/assessment/${response.data}`)
+            })
+            .catch((error) => {
+                openSnack("error", "Impossible de créer l'évaluation pour le moment...")
+                console.log(error);
+            });
+    }
 
     return (
         <>
@@ -77,8 +153,9 @@ export default function CreerEvaluationPage() {
                     </Grid>
                     <Grid item xs={4}>
                         <FormControl fullWidth>
-                            <InputLabel id="language-label">Language de programmation</InputLabel>
+                            <InputLabel id="language-label">Language de programmation *</InputLabel>
                             <Select
+                                required
                                 labelId="language-label"
                                 value={language}
                                 label="Language de programmation"
@@ -95,7 +172,24 @@ export default function CreerEvaluationPage() {
                             <FormControlLabel control={<Switch checked={fileSwitch} onChange={evt => setFileSwitch(evt.target.checked)} />} label="Uploader un fichier de correction .py" />
                         </FormGroup>
                         {fileSwitch &&
-                            <input type="file" accept=".py" onChange={handleFileChange} />
+                            <>
+                                <input
+                                    ref={fileInput}
+                                    onChange={handleFileChange}
+                                    type="file"
+                                    accept=".py"
+                                    style={{ display: "none" }}
+                                />
+                                <Button variant="text" onClick={() => fileInput.current.click()} sx={{mr: 2}}>
+                                    Sélectionner
+                                </Button>
+                                {file &&
+                                    <>
+                                        {file.name}
+                                    </>
+                                }
+                            </>
+
                         }
                         {!fileSwitch &&
                             <>
@@ -117,13 +211,30 @@ export default function CreerEvaluationPage() {
                         }
                     </Grid>
                     <Grid item xs={4} sx={{mt:3}}>
-                        <Button variant="contained" onClick={evt => console.log(user.token)}>
-                            Créer l'évaluation
+                        <Button variant="contained" onClick={verifyFields}>
+                            Créer
                         </Button>
+                        <Button sx={{ml: 2}} variant="outlined" onClick={reset}>Tout vider</Button>
+                    </Grid>
+                    <Grid item xs={8} sx={{mt:3}} />
+                    <Grid item xs={12} sx={{mt:3}}>
+                        {evalUrl &&
+                            <Typography>
+                                L'URL de rendu public pour ce projet est : <a target="_blank" rel="noreferrer" href={evalUrl}>{evalUrl}</a>
+                            </Typography>
+                        }
                     </Grid>
                 </Grid>
-
             </Container>
+            <Snackbar
+                open={open}
+                autoHideDuration={10000}
+                onClose={closeSnack}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+                <Alert onClose={closeSnack} severity={severity} sx={{ width: '100%' }}>
+                    {msg}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

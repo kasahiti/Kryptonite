@@ -21,9 +21,10 @@ if (localStorage.getItem("user") === null) {
 
 const UserContext = createContext(localStorage.getItem('user'));
 
-const baseAPI = "https://krypto-backend.adron.ch/api";
+
 
 const UserProvider = ({children}) => {
+    const baseAPI = "https://krypto-backend.adron.ch/api";
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
     const clearUser = () => {
@@ -69,7 +70,7 @@ const UserProvider = ({children}) => {
     }
 
     return (
-        <UserContext.Provider value={{user, login, logout, changePassword}}>
+        <UserContext.Provider value={{user, login, logout, changePassword, baseAPI}}>
             {children}
         </UserContext.Provider>
     );
