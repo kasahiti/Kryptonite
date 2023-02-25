@@ -172,7 +172,7 @@ export default function CreerEvaluationPage() {
                             <FormControlLabel control={<Switch checked={fileSwitch} onChange={evt => setFileSwitch(evt.target.checked)} />} label="Uploader un fichier de correction .py" />
                         </FormGroup>
                         {fileSwitch &&
-                            <>
+                            <Box sx={{border: "1px solid", borderRadius: "6px", borderColor: "rgba(145, 158, 171, 0.32)", padding: "10px", maxWidth: "375px"}}>
                                 <input
                                     ref={fileInput}
                                     onChange={handleFileChange}
@@ -188,8 +188,7 @@ export default function CreerEvaluationPage() {
                                         {file.name}
                                     </>
                                 }
-                            </>
-
+                            </Box>
                         }
                         {!fileSwitch &&
                             <>

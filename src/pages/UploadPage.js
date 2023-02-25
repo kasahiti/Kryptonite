@@ -8,20 +8,22 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    Select,
+    Select, Snackbar,
     Stack,
     TextField,
     Typography
 } from '@mui/material';
+import MuiAlert from "@mui/material/Alert";
 
 // hooks
 import {useParams} from "react-router-dom";
-import {createRef, useContext, useEffect, useState} from "react";
+import {createRef, forwardRef, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import useResponsive from '../hooks/useResponsive';
 
 // components
 import UserContext from "../index";
+
 
 // ----------------------------------------------------------------------
 
@@ -52,6 +54,10 @@ const StyledContent = styled('div')(({theme}) => ({
 }));
 
 // ----------------------------------------------------------------------
+const Alert = forwardRef((props, ref) => {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 
 export default function UploadPage() {
     const { baseAPI } = useContext(UserContext);
@@ -63,6 +69,11 @@ export default function UploadPage() {
     const [studentLastName, setStudentLastName] = useState("");
     const [file, setFile] = useState(null);
     const fileInput = createRef();
+    const [errorUuid, setErrorUuid] = useState(false);
+
+    const [open, setOpen] = useState(false);
+    const [severity, setSeverity] = useState("success");
+    const [msg, setMsg] = useState("This is a message");
 
     const handleFileChange = (e) => {
         if (e.target.files) {
@@ -71,14 +82,37 @@ export default function UploadPage() {
         }
     };
 
+    const openSnack = (severity, message) => {
+        setSeverity(severity);
+        setMsg(message);
+        setOpen(true);
+    };
+
+    const closeSnack = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpen(false);
+    };
+
     const getByUUID = () => {
         axios.get(`${baseAPI}/assessments/public?uuid=${uuid}`)
             .then(response => {
                 setEvalName(response.data)
+                setErrorUuid(false);
             })
             .catch(error => {
                 console.error(error);
+                setErrorUuid(true);
             })
+    }
+
+    const reset = () => {
+        setStudentFirstName('');
+        setStudentLastName('');
+        setFile(null);
+        closeSnack();
     }
 
     const upload = () => {
@@ -98,15 +132,26 @@ export default function UploadPage() {
         axios(config)
             .then(response => {
                 console.log(JSON.stringify(response.data));
+                reset()
+                openSnack("success", "Fichier envoyé!")
             })
             .catch(error => {
                 console.log(error);
+                openSnack("error", "Une erreur s'est produite")
             });
+    }
+
+    const checkFields = () => {
+        if(studentFirstName.length > 0 && studentLastName.length > 0 && file != null) {
+            upload();
+        } else {
+            openSnack("error", "Il manque des champs obligatoires");
+        }
     }
 
     useEffect(() => {
         getByUUID()
-    }, []);
+    }, [getByUUID]);
 
     return (
         <>
@@ -126,55 +171,81 @@ export default function UploadPage() {
                     </StyledSection>
                 )}
 
-                <Container maxWidth="sm">
-                    <StyledContent>
-                        <Typography variant="h4" gutterBottom>
-                            Rendu étudiant du projet : {evalName}
-                        </Typography>
-                        <Grid container spacing={2} sx={{mt: 2}}>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label="Prénom"
-                                    value={studentFirstName}
-                                    onChange={evt => setStudentFirstName(evt.target.value)}
-                                />
+                {!errorUuid &&
+                    <Container maxWidth="sm">
+                        <StyledContent>
+                            <Typography variant="h4" gutterBottom>
+                                Rendu étudiant du projet : {evalName}
+                            </Typography>
+                            <Grid container spacing={2} sx={{mt: 2}}>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        label="Prénom"
+                                        value={studentFirstName}
+                                        onChange={evt => setStudentFirstName(evt.target.value)}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        label="Nom"
+                                        value={studentLastName}
+                                        onChange={evt => setStudentLastName(evt.target.value)}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <input
+                                        ref={fileInput}
+                                        onChange={handleFileChange}
+                                        type="file"
+                                        accept="application/zip,.rar,.7z,.zip"
+                                        style={{ display: "none" }}
+                                    />
+                                    <Box sx={{border: "1px solid", borderRadius: "6px", borderColor: "rgba(145, 158, 171, 0.32)", padding: "10px"}}>
+                                        <Button variant="text" onClick={() => fileInput.current.click()} sx={{mr: 2}}>
+                                            Sélectionner
+                                        </Button>
+                                        {file &&
+                                            <>
+                                                {file.name}
+                                            </>
+                                        }
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button variant="contained" onClick={checkFields} sx={{mr: 2}}>
+                                        Envoyer!
+                                    </Button>
+                                    <Button variant="outlined" onClick={reset} sx={{mr: 2}}>
+                                        Tout vider
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label="Nom"
-                                    value={studentLastName}
-                                    onChange={evt => setStudentLastName(evt.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <input
-                                    ref={fileInput}
-                                    onChange={handleFileChange}
-                                    type="file"
-                                    accept="application/zip,.rar,.7z,.zip"
-                                    style={{ display: "none" }}
-                                />
-                                <Button variant="text" onClick={() => fileInput.current.click()} sx={{mr: 2}}>
-                                    Sélectionner
-                                </Button>
-                                {file &&
-                                    <>
-                                        {file.name}
-                                    </>
-                                }
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Button variant="outlined" onClick={upload} sx={{mr: 2}}>
-                                    Envoyer!
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </StyledContent>
-                </Container>
+                        </StyledContent>
+                    </Container>
+                }
+                {errorUuid &&
+                    <Container maxWidth="sm">
+                        <StyledContent>
+                            <Typography variant="h3">
+                                Aucun projet trouvé!
+                            </Typography>
+                        </StyledContent>
+                    </Container>
+                }
+
+                <Snackbar
+                    open={open}
+                    autoHideDuration={10000}
+                    onClose={closeSnack}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+                    <Alert onClose={closeSnack} severity={severity} sx={{ width: '100%' }}>
+                        {msg}
+                    </Alert>
+                </Snackbar>
             </StyledRoot>
         </>
     );
