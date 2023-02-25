@@ -2,6 +2,7 @@ import {useContext, useState} from 'react';
 // @mui
 import {alpha} from '@mui/material/styles';
 import {Avatar, Box, Divider, IconButton, MenuItem, Popover, Stack, Typography} from '@mui/material';
+import { deepOrange, deepPurple } from '@mui/material/colors';
 // mocks_
 import {Link, useNavigate} from 'react-router-dom';
 import UserContext from '../../../index';
@@ -10,14 +11,7 @@ import UserContext from '../../../index';
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
-    {
-        label: 'Accueil',
-        path: '/app/dashboard'
-    },
-    {
-        label: 'Mon compte',
-        path: '/app/compte'
-    },
+    
 ];
 
 // ----------------------------------------------------------------------
@@ -60,7 +54,7 @@ export default function AccountPopover() {
                     }),
                 }}
             >
-                <Avatar src='/assets/images/avatars/avatar_default.jpg' alt="photoURL"/>
+                <Avatar sx={{ bgcolor: deepPurple[500] }}>{user.email.charAt(0).toUpperCase()}</Avatar>
             </IconButton>
 
             <Popover

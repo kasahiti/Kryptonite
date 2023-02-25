@@ -4,6 +4,7 @@ import {useLocation} from 'react-router-dom';
 // @mui
 import {alpha, styled} from '@mui/material/styles';
 import {Avatar, Box, Drawer, Link, Typography} from '@mui/material';
+import { deepOrange, deepPurple } from '@mui/material/colors';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
@@ -60,7 +61,7 @@ export default function Nav({openNav, onCloseNav}) {
             <Box sx={{mb: 5, mx: 2.5}}>
                 <Link underline="none">
                     <StyledAccount>
-                        <Avatar src='/assets/images/avatars/avatar_default.jpg' alt="photoURL"/>
+                        <Avatar sx={{ bgcolor: deepPurple[500] }}>{user.email.charAt(0).toUpperCase()}</Avatar>
 
                         <Box sx={{ml: 2}}>
                             <Typography variant="subtitle2" sx={{color: 'text.primary'}}>
