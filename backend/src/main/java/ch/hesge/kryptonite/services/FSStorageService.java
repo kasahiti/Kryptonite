@@ -4,6 +4,7 @@ import ch.hesge.kryptonite.storage.StorageException;
 import ch.hesge.kryptonite.storage.StorageFileNotFoundException;
 import ch.hesge.kryptonite.storage.StorageProperties;
 import ch.hesge.kryptonite.storage.StorageService;
+import ch.hesge.kryptonite.utils.TerminalRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -64,6 +65,10 @@ public class FSStorageService implements StorageService {
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
             }
+
+            TerminalRunner.shell("unp", String.valueOf(newRootPath), file.getOriginalFilename());
+            TerminalRunner.shell("rm", String.valueOf(newRootPath), file.getOriginalFilename());
+
             return newRootPath;
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);

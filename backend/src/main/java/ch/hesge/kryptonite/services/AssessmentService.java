@@ -32,7 +32,7 @@ public class AssessmentService {
      * @param tmp A User representing the user who is registering the assessment.
      * @throws IOException If an I/O error occurs.
      */
-    public void register(String name, String language, MultipartFile file, User tmp) throws IOException {
+    public String register(String name, String language, MultipartFile file, User tmp) throws IOException {
         var user = userRepository.findByEmail(tmp.getEmail()).orElseThrow();
         var uuid = String.valueOf(UUID.randomUUID());
         var correction = new String(file.getBytes());
@@ -48,5 +48,7 @@ public class AssessmentService {
                 .build();
 
         assessmentRepository.save(assessment);
+
+        return uuid;
     }
 }

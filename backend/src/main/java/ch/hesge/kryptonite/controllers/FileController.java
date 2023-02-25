@@ -15,6 +15,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * A REST controller that handles HTTP requests for file storage and retrieval.
@@ -26,6 +29,8 @@ public class FileController {
     private final StorageService storageService;
     private final StudentProjectRepository studentRepository;
     private final AssessmentRepository assessmentRepository;
+
+    private final List<String> extensions = Arrays.asList("zip", "rar", "7z");
 
 
     /**
@@ -57,9 +62,17 @@ public class FileController {
             @RequestParam("uuid") String uuid,
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName) {
-        Assessment assessment = assessmentRepository.findByUuid(uuid).orElseThrow();
+        String originalFilename = file.getOriginalFilename();
+        assert originalFilename != null;
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
 
+        if(!extensions.contains(extension)){
+            return ResponseEntity.badRequest().body("Unsupported file type !");
+        }
+
+        Assessment assessment = assessmentRepository.findByUuid(uuid).orElseThrow();
         String path = String.valueOf(storageService.store(file, uuid, firstName+"_"+lastName));
+
         StudentProject project = StudentProject.builder()
                 .firstName(firstName)
                 .lastName(lastName)

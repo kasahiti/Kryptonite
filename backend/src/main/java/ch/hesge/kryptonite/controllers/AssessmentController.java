@@ -43,8 +43,8 @@ public class AssessmentController {
             @RequestParam("correction") MultipartFile file
     ) throws IOException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        service.register(name, language, file, user);
-        return ResponseEntity.ok().body("Assessment created!");
+        String uuid = service.register(name, language, file, user);
+        return ResponseEntity.ok().body(uuid);
     }
 
     /**
@@ -57,5 +57,11 @@ public class AssessmentController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Assessment> assessments = repository.findByUser(user).orElseThrow();
         return ResponseEntity.ok().body(assessments);
+    }
+
+    @GetMapping("public")
+    public ResponseEntity<String> getAssessmentByUUID(@RequestParam("uuid") String uuid) {
+        Assessment assessment = repository.findByUuid(uuid).orElseThrow();
+        return ResponseEntity.ok().body(assessment.getName());
     }
 }

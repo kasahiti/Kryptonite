@@ -36,7 +36,7 @@ public class JobScheduler {
 
         List<StudentProject> projects = repository.findByStatus(JobStatus.NOT_STARTED).get();
         if (!projects.isEmpty()) {
-            log.info("There is work to do !");
+            log.info("Performing check50 on student's project...");
             StudentProject project = projects.get(0);
             project.setStatus(JobStatus.STARTED);
             repository.save(project);
@@ -51,6 +51,7 @@ public class JobScheduler {
             project.setJsonResults(output);
             project.setStatus(JobStatus.DONE);
             repository.save(project);
+            log.info("Check50 done.");
         }
     }
 }
