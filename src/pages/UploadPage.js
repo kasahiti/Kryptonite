@@ -117,7 +117,7 @@ export default function UploadPage() {
             <StyledRoot>
                 {mdUp && (
                     <StyledSection>
-                        <Typography variant="h3" sx={{px: 5, mt: 10, mb: 5}}>
+                        <Typography variant="h3" sx={{px: 5, mt: 10, mb: 5, ml: "auto", mr: "auto"}}>
                             Kryptonite
                         </Typography>
                         <Box sx={{justifyContent: "center", alignItems: "center"}}>
