@@ -1,0 +1,11 @@
+# Systemd service file
+[Unit]
+Description=Kryptonite Service
+
+[Service]
+User=debian
+ExecStart=java -jar /home/debian/kryptonite.jar
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

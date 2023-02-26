@@ -6,3 +6,8 @@ sudo pip install check50-java
 sudo mkdir /kryptonite-students
 sudo chown -R debian: /kryptonite-students/
 sudo chmod 775 /kryptonite-students/
+
+# Systemd service file
+sudo systemctl daemon-reload
+sudo systemctl enable kryptonite.service
+sudo systemctl start kryptonite
