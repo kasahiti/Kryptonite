@@ -28,6 +28,7 @@ public class ApplicationConfig {
 
     /**
      * User details service responsible for retrieving user details from a repository.
+     *
      * @return an instance of UserDetailsService
      */
     @Bean
@@ -38,6 +39,7 @@ public class ApplicationConfig {
 
     /**
      * Authentication provider used  to authenticate users.
+     *
      * @return an instance of AuthenticationProvider
      */
     @Bean
@@ -50,6 +52,7 @@ public class ApplicationConfig {
 
     /**
      * Authentication manager responsible for managing authentication requests.
+     *
      * @param config the authentication configuration
      * @return an instance of AuthenticationManager
      * @throws Exception if an error occurs while creating the authentication manager
@@ -61,6 +64,7 @@ public class ApplicationConfig {
 
     /**
      * Password encoder used to encode and decode passwords.
+     *
      * @return a BCryptPasswordEncoder
      */
     @Bean

@@ -24,6 +24,7 @@ public class StudentProjectController {
 
     /**
      * HTTP endpoint for retrieving all student projects.
+     *
      * @return a ResponseEntity containing all student projects
      */
     @GetMapping()

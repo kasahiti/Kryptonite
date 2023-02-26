@@ -35,6 +35,7 @@ public class FileController {
 
     /**
      * HTTP endpoint for downloading a file.
+     *
      * @param filename the name of the file to download
      * @return a ResponseEntity containing the file as a Resource
      */
@@ -50,10 +51,11 @@ public class FileController {
 
     /**
      * HTTP endpoint for uploading a file.
-     * @param file the uploaded file
-     * @param uuid the UUID associated with the file
+     *
+     * @param file      the uploaded file
+     * @param uuid      the UUID associated with the file
      * @param firstName the first name of the student
-     * @param lastName the last name of the student
+     * @param lastName  the last name of the student
      * @return a ResponseEntity
      */
     @PostMapping("/")
@@ -64,14 +66,14 @@ public class FileController {
             @RequestParam("lastName") String lastName) {
         String originalFilename = file.getOriginalFilename();
         assert originalFilename != null;
-        String extension = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
 
-        if(!extensions.contains(extension)){
+        if (!extensions.contains(extension)) {
             return ResponseEntity.badRequest().body("Unsupported file type !");
         }
 
         Assessment assessment = assessmentRepository.findByUuid(uuid).orElseThrow();
-        String path = String.valueOf(storageService.store(file, uuid, firstName+"_"+lastName));
+        String path = String.valueOf(storageService.store(file, uuid, firstName + "_" + lastName));
 
         StudentProject project = StudentProject.builder()
                 .firstName(firstName)
@@ -88,6 +90,7 @@ public class FileController {
 
     /**
      * Exception handler for when a requested file is not found.
+     *
      * @param exc the exception thrown when a file is not found
      * @return a ResponseEntity with a 404 Not Found status
      */

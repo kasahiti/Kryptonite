@@ -26,10 +26,11 @@ public class AssessmentService {
     /**
      * Creates new assessment entity. This method also creates a directory for the assessment's check50 data and
      * stores the correction in that directory.
-     * @param name The name of the assessment.
+     *
+     * @param name     The name of the assessment.
      * @param language The language of the assessment.
-     * @param file A File containing the correction string for the assessment.
-     * @param tmp A User representing the user who is registering the assessment.
+     * @param file     A File containing the correction string for the assessment.
+     * @param tmp      A User representing the user who is registering the assessment.
      * @throws IOException If an I/O error occurs.
      */
     public String register(String name, String language, MultipartFile file, User tmp) throws IOException {

@@ -1,10 +1,12 @@
 package ch.hesge.kryptonite.controllers;
 
 import ch.hesge.kryptonite.domain.Assessment;
+import ch.hesge.kryptonite.domain.Role;
 import ch.hesge.kryptonite.domain.User;
 import ch.hesge.kryptonite.repositories.AssessmentRepository;
 import ch.hesge.kryptonite.services.AssessmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,9 +31,10 @@ public class AssessmentController {
 
     /**
      * Endpoint for creating assessments
-     * @param name name of the assessment
+     *
+     * @param name     name of the assessment
      * @param language language of the assessment
-     * @param file correction file for the assessment
+     * @param file     correction file for the assessment
      * @return a ResponseEntity
      * @throws IOException if an IO problem arises
      */
@@ -47,8 +50,15 @@ public class AssessmentController {
         return ResponseEntity.ok().body(uuid);
     }
 
+    @GetMapping("/{uuid}")
+    public ResponseEntity<String> getAssessmentByUUID(@PathVariable String uuid) {
+        Assessment assessment = repository.findByUuid(uuid).orElseThrow();
+        return ResponseEntity.ok().body(assessment.getName());
+    }
+
     /**
      * Endpoint for retrieving assessments for logged-in user
+     *
      * @return a ResponseEntity containing a list of Assessments
      */
     @GetMapping()
@@ -59,9 +69,20 @@ public class AssessmentController {
         return ResponseEntity.ok().body(assessments);
     }
 
-    @GetMapping("public")
-    public ResponseEntity<String> getAssessmentByUUID(@RequestParam("uuid") String uuid) {
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<String> deleteAssessment(@PathVariable String uuid) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
-        return ResponseEntity.ok().body(assessment.getName());
+
+        if (user.getRole().equals(Role.ROLE_ADMIN)) {
+            repository.delete(assessment);
+        } else if (assessment.getUser().equals(user)) {
+            repository.delete(assessment);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the rights to delete this ressource");
+        }
+
+        return ResponseEntity.ok().body("Assessment deleted successfully!");
     }
 }

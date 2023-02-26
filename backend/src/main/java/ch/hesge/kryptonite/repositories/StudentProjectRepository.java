@@ -1,8 +1,6 @@
 package ch.hesge.kryptonite.repositories;
 
-import ch.hesge.kryptonite.domain.Assessment;
 import ch.hesge.kryptonite.domain.StudentProject;
-import ch.hesge.kryptonite.domain.User;
 import ch.hesge.kryptonite.jobs.JobStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -14,14 +14,16 @@ import java.util.List;
  * This utility class is used by the Kryptonite to run the check50 to check the code of student projects.
  */
 public class TerminalRunner {
-    private TerminalRunner() { }
+    private TerminalRunner() {
+    }
 
     /**
      * Runs the given shell command with the provided arguments in the given student project path, and returns the
      * output as a string.
-     * @param command The command to run.
+     *
+     * @param command            The command to run.
      * @param studentProjectPath The path to the student project directory.
-     * @param args Additional arguments to pass to the command.
+     * @param args               Additional arguments to pass to the command.
      * @return The output of the command as a string.
      */
     public static String shell(String command, String studentProjectPath, String... args) {

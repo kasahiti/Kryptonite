@@ -41,8 +41,9 @@ public class FSStorageService implements StorageService {
 
     /**
      * Stores a file in the specified subdirectory within the location specified
-     * @param file the multipart file to store
-     * @param uuid the UUID of the file
+     *
+     * @param file    the multipart file to store
+     * @param uuid    the UUID of the file
      * @param subPath the subdirectory within the root location to store the file
      * @return the final path where the file was stored
      * @throws StorageException if the file is empty or if an error occurs while storing the file
@@ -57,7 +58,7 @@ public class FSStorageService implements StorageService {
 
             Path newRootPath = Path.of(rootLocation + "/" + uuid + "/" + subPath);
             Path destinationFile = newRootPath.resolve(
-                    Paths.get(Objects.requireNonNull(file.getOriginalFilename())))
+                            Paths.get(Objects.requireNonNull(file.getOriginalFilename())))
                     .normalize()
                     .toAbsolutePath();
 
@@ -77,6 +78,7 @@ public class FSStorageService implements StorageService {
 
     /**
      * Returns a stream of paths to all files stored at the location specified by the StorageProperties object.
+     *
      * @return a stream of paths to all stored files
      * @throws StorageException if an error occurs while reading stored files
      */
@@ -94,6 +96,7 @@ public class FSStorageService implements StorageService {
 
     /**
      * Load and return a path to the specified filename
+     *
      * @param filename the file to load
      * @return
      */
@@ -104,6 +107,7 @@ public class FSStorageService implements StorageService {
 
     /**
      * Returns a Resource representing a specific file
+     *
      * @param filename the name of the file to load
      * @return a Resource representing the specified file
      * @throws StorageFileNotFoundException if the specified file cannot be read
@@ -158,7 +162,8 @@ public class FSStorageService implements StorageService {
     /**
      * Creates the check50 directory inside the assessment directory. It also creates necessary files for check50, like
      * __init__.py and .cs50.yml files.
-     * @param uuid uuid of the assessment
+     *
+     * @param uuid      uuid of the assessment
      * @param checkData check data, more specifically python file containing all checks for the referenced assessment
      * @return Path to the check50 folder
      */

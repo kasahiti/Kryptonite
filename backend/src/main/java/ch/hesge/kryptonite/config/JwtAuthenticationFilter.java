@@ -37,11 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Implementation of the filter method that performs JWT authentication and authorization.
-     * @param request the HTTP request
-     * @param response the HTTP response
+     *
+     * @param request     the HTTP request
+     * @param response    the HTTP response
      * @param filterChain the filter chain
      * @throws ServletException if any exception with the servlet
-     * @throws IOException if any IO exception
+     * @throws IOException      if any IO exception
      */
     @Override
     protected void doFilterInternal(
@@ -87,6 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Ignore all requests to h2-console, else perform filter
+     *
      * @param request the HTTP request
      * @return true if the filter should not be applied to the request, false otherwise
      */

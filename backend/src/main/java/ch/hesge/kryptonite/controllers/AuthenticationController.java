@@ -29,6 +29,7 @@ public class AuthenticationController {
 
     /**
      * HTTP endpoint for registering a new user.
+     *
      * @param request the RegisterRequest
      * @return a ResponseEntity
      */
@@ -42,6 +43,7 @@ public class AuthenticationController {
 
     /**
      * HTTP endpoint for authenticating a user.
+     *
      * @param request the AuthenticationRequest
      * @return a ResponseEntity
      */

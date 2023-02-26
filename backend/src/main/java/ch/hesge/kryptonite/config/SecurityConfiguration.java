@@ -41,6 +41,7 @@ public class SecurityConfiguration {
 
     /**
      * Spring security filter chain to secure the application
+     *
      * @param http the HTTP security
      * @return a SecurityFilterChain
      * @throws Exception if there is an error
@@ -78,6 +79,7 @@ public class SecurityConfiguration {
 
     /**
      * CORS configuration for the application
+     *
      * @return a CorsConfigurationSource
      */
     @Bean

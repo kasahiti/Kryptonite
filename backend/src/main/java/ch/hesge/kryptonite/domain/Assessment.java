@@ -23,7 +23,7 @@ public class Assessment {
     private String uuid;
 
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;

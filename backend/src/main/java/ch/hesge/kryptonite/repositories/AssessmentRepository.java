@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
     Optional<List<Assessment>> findByUser(User user);
+
     Optional<Assessment> findByUuid(String uuid);
 }
