@@ -103,7 +103,7 @@ export default function EvaluationsPage() {
 
     useEffect(() => {
         getAssessments()
-    }, [baseAPI, getAssessments, user.token])
+    }, [])
 
 
     return (
@@ -136,7 +136,7 @@ export default function EvaluationsPage() {
                                     <TableBody>
                                         {rows.map((row) => (
                                             <TableRow
-                                                key={row.name}
+                                                key={row.uuid}
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row">
@@ -144,7 +144,7 @@ export default function EvaluationsPage() {
                                                 </TableCell>
                                                 <TableCell align="right">{row.language}</TableCell>
                                                 <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/assessment/${row.uuid}`} target="_blank" rel="noreferrer">{row.uuid}</a></TableCell>
-                                                <TableCell align="center"><Fab size="medium" color="secondary" aria-label="edit"><VisibilityIcon /></Fab></TableCell>
+                                                <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/app/evaluations/${row.uuid}`}><Fab size="medium" color="secondary" aria-label="edit"><VisibilityIcon /></Fab></a></TableCell>
                                                 <TableCell align="center"><Button variant="contained" color="primary">Modifier</Button></TableCell>
                                                 <TableCell align="center"><Button color="error" onClick={() => deleteAssessment(row.uuid)}>Supprimer</Button></TableCell>
                                             </TableRow>

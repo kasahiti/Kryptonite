@@ -24,6 +24,7 @@ import UploadPage from "./pages/UploadPage";
 import AdministrationPage from "./pages/AdministrationPage";
 import EvaluationsPage from "./pages/EvaluationsPage";
 import CreerEvaluationPage from "./pages/CreerEvaluationPage";
+import EvaluationRendusPage from "./pages/EvaluationRendusPage";
 
 // ----------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ export default function App() {
                         <Route exact path="dashboard" element={<DashboardAppPage/>}/>
                         <Route exact path="assessment" element={<CreerEvaluationPage/>}/>
                         <Route exact path="evaluations" element={<EvaluationsPage/>}/>
-
+                        <Route exact path="evaluations/:uuid" element={<EvaluationRendusPage/>}/>
                         <Route exact path="administration" element={<AdministrationPage/>}/>
                         <Route exact path="compte" element={<UserPage/>}/>
                     </Route>

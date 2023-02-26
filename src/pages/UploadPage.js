@@ -156,7 +156,7 @@ export default function UploadPage() {
     return (
         <>
             <Helmet>
-                <title> Upload | Kryptonite </title>
+                <title> Rendu étudiant | Kryptonite </title>
             </Helmet>
 
             <StyledRoot>
@@ -179,7 +179,7 @@ export default function UploadPage() {
                             </Typography>
                             <Grid container spacing={2} sx={{mt: 1}}>
                                 <Grid item xs={12}>
-                                    <Alert severity="warning">Veillez à bien rendre vos fichiers compressé au format zip !</Alert>
+                                    <Alert severity="warning">Veillez à rendre un seul fichier compressé au format zip !</Alert>
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField
