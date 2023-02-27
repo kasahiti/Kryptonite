@@ -6,7 +6,7 @@ Kryptonite est une application créée dans le cadre de mon Travail de Bachelor 
 Pour lancer le backend, exécuter la commande `mvn package` dans le répertoire [backend](backend) et lancer le fichier jar résultant avec la commande `java -jar kryptonite.jar`. 
 Enfin, lancer le frontend avec la commande `npm start` dans le répertoire racine.
 
-Vous pouvez également visualiser la version de démonstration sur [Heroku](https://kryptonite-front.herokuapp.com/login). L'utilisateur par défaut qui est crée est `root` avec le mot de passe `Kryptonite321!`
+Vous pouvez également visualiser la version de démonstration sur [Heroku](https://kryptonite-front.herokuapp.com/login).
 
 ## Technologies Utilisées
 ### Frontend
