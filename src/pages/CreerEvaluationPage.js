@@ -142,7 +142,7 @@ export default function CreerEvaluationPage() {
                 </Stack>
 
                 <Grid container spacing={2}>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             fullWidth
                             required
@@ -151,7 +151,7 @@ export default function CreerEvaluationPage() {
                             onChange={evt => setEvalName(evt.target.value)}
                         />
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <FormControl fullWidth>
                             <InputLabel id="language-label">Language de programmation *</InputLabel>
                             <Select
@@ -166,7 +166,7 @@ export default function CreerEvaluationPage() {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4} />
+                    <Grid item xs={12} />
                     <Grid item xs={12}>
                         <FormGroup sx={{mb: 3}}>
                             <FormControlLabel control={<Switch checked={fileSwitch} onChange={evt => setFileSwitch(evt.target.checked)} />} label="Uploader un fichier de correction .py" />

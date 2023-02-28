@@ -2,6 +2,7 @@ package ch.hesge.kryptonite.controllers;
 
 import ch.hesge.kryptonite.domain.Assessment;
 import ch.hesge.kryptonite.domain.Role;
+import ch.hesge.kryptonite.domain.StudentProject;
 import ch.hesge.kryptonite.domain.User;
 import ch.hesge.kryptonite.repositories.AssessmentRepository;
 import ch.hesge.kryptonite.services.AssessmentService;
@@ -57,7 +58,7 @@ public class AssessmentController {
     }
 
     /**
-     * Endpoint for retrieving assessments for logged-in user
+     * Endpoint for retrieving assessments for logged-in user, or all assessments for an Admin user
      *
      * @return a ResponseEntity containing a list of Assessments
      */
@@ -65,8 +66,31 @@ public class AssessmentController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<List<Assessment>> getMyAssessments() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Assessment> assessments = repository.findByUser(user).orElseThrow();
-        return ResponseEntity.ok().body(assessments);
+
+        if (user.getRole().equals(Role.ROLE_ADMIN)) {
+            return ResponseEntity.ok().body(repository.findAll());
+        } else {
+            List<Assessment> assessments = repository.findByUser(user).orElseThrow();
+            return ResponseEntity.ok().body(assessments);
+        }
+    }
+
+    /**
+     * Endpoint for retrieving all students project of a specific assessment (by uuid)
+     *
+     * @return a ResponseEntity containing a list of Assessments
+     */
+    @GetMapping("/{uuid}/projects")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<?> getMyAssessments(@PathVariable String uuid) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Assessment assessment = repository.findByUuid(uuid).orElseThrow();
+
+        if (user.getRole().equals(Role.ROLE_ADMIN) || assessment.getUser().equals(user)) {
+            return ResponseEntity.ok().body(assessment.getStudentProjects());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the rights to access this ressource");
+        }
     }
 
     @DeleteMapping("/{uuid}")
