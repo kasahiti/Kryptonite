@@ -2,6 +2,7 @@ package ch.hesge.kryptonite.repositories;
 
 import ch.hesge.kryptonite.domain.Assessment;
 import ch.hesge.kryptonite.domain.User;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

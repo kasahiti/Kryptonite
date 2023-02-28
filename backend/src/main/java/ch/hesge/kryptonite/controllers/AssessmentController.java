@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -87,7 +88,7 @@ public class AssessmentController {
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
 
         if (user.getRole().equals(Role.ROLE_ADMIN) || assessment.getUser().equals(user)) {
-            return ResponseEntity.ok().body(assessment.getStudentProjects());
+            return ResponseEntity.ok().body(assessment.getStudentProjects().stream().sorted(Comparator.comparing(StudentProject::getFirstName)));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the rights to access this ressource");
         }

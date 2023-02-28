@@ -59,6 +59,8 @@ const Alert = forwardRef((props, ref) => {
 });
 
 
+// TODO: Can't send twice on same page; the file selection doesn't work after an initial "Envoyé!"
+
 export default function UploadPage() {
     const { baseAPI } = useContext(UserContext);
     const {uuid} = useParams();

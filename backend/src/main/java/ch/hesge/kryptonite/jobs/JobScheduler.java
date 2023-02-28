@@ -27,7 +27,7 @@ public class JobScheduler {
      * Retrieve all student projects with JobStatus=NOT_STARTED. If there's any, takes the first, and perform check50
      * on it, stores the json result in it, changes the status and save the changes using the repository
      */
-    @Scheduled(fixedRate = 20000)
+    @Scheduled(fixedRate = 60000)
     public void startCorrection() {
         log.info("Performing automatic checks");
 
