@@ -120,7 +120,7 @@ export default function EvaluationsPage() {
                                 Mes évaluations
                             </Typography>
                         </Grid>
-                        <Grid item xs={10}>
+                        <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                     <TableHead>

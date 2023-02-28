@@ -209,7 +209,7 @@ export default function CreerEvaluationPage() {
                             </>
                         }
                     </Grid>
-                    <Grid item xs={4} sx={{mt:3}}>
+                    <Grid item xs={12} md={4} sx={{mt:3}}>
                         <Button variant="contained" onClick={verifyFields}>
                             Créer
                         </Button>
