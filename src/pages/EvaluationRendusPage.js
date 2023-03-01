@@ -14,7 +14,7 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Chip
+    Chip, Tab, Tabs, Box
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MuiAlert from "@mui/material/Alert";
@@ -52,9 +52,6 @@ export default function EvaluationRendusPage() {
     const [studentProjects, setStudentProjects] = useState([]);
     const [evalName, setEvalName] = useState("");
 
-    const [open, setOpen] = useState(false);
-    const [severity, setSeverity] = useState("success");
-    const [msg, setMsg] = useState("This is a message");
     const [expanded, setExpanded] = useState(false);
 
     const getProjects = () => {
@@ -70,6 +67,7 @@ export default function EvaluationRendusPage() {
         axios(config)
             .then(response => {
                 setStudentProjects(response.data)
+                console.log(response.data)
             })
             .catch(error => {
                 console.log(error);
@@ -101,20 +99,6 @@ export default function EvaluationRendusPage() {
         setExpanded(isExpanded ? panel : false);
     };
 
-    const openSnack = (severity, message) => {
-        setSeverity(severity);
-        setMsg(message);
-        setOpen(true);
-    };
-
-    const closeSnack = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpen(false);
-    };
-
 
     return (
         <>
@@ -142,31 +126,39 @@ export default function EvaluationRendusPage() {
                                             {project.firstName} {project.lastName}
                                         </Typography>
                                         <Typography sx={{ color: 'text.secondary' }}>
-                                            {project.status.includes("DONE") ?
-                                                  <Chip label="Correction terminée" color="success" size="small" />
-                                                : <Chip label="Correction en cours" color="primary" size="small" />
+                                            {project.status.includes("DONE") ? <Chip label="Correction terminée" color="success" size="small" />
+                                                : project.status.includes("NOT_STARTED") ? <Chip label="En attente" color="info" size="small" />
+                                                : <Chip label="Correction en cours" color="warning" size="small" />
                                             }
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <Typography>
-                                            TestTest
-                                        </Typography>
+                                        <Grid container spacing={2} justifyContent="center" alignItems="center">
+                                            {project.jsonResults && !JSON.parse(project.jsonResults).error && JSON.parse(project.jsonResults).results.map((result) => (
+                                                <>
+                                                    <Grid item sx={{mt: 2}} xs={5} textAlign={"right"}>
+                                                        <Typography variant="h5" color={result.passed ? "success.main" : "error.main"}>Check : {result.name}</Typography>
+                                                    </Grid>
+                                                    <Grid item sx={{mt: 2}} xs={7} textAlign={"left"}>
+                                                        <Typography variant="body1"><b>Description</b> : {result.description}</Typography>
+                                                        <Typography variant="body1"><b>Check result</b> : {result.passed ? 'Passed' : 'Failed'}</Typography>
+                                                        <Typography variant="body1"><b>Logs</b> : </Typography>
+                                                        {result.log.map((line) => (
+                                                            <Typography sx={{ml: 2}} variant="body1">- {line}</Typography>
+                                                        ))}
+                                                    </Grid>
+                                                </>
+                                            ))}
+                                            {project.jsonResults && JSON.parse(project.jsonResults).error &&
+                                                <Typography>Error : {JSON.parse(project.jsonResults).error.value}</Typography>
+                                            }
+                                        </Grid>
                                     </AccordionDetails>
                                 </Accordion>
                                 ))}
                         </Grid>
                     </Grid>
                 </Stack>
-                <Snackbar
-                    open={open}
-                    autoHideDuration={10000}
-                    onClose={closeSnack}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
-                    <Alert onClose={closeSnack} severity={severity} sx={{ width: '100%' }}>
-                        {msg}
-                    </Alert>
-                </Snackbar>
             </Container>
         </>
     );

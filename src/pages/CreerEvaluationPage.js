@@ -35,7 +35,20 @@ const Alert = forwardRef((props, ref) => {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const defaultCode = `import check50\nimport check50_java\n\n@check50.check()\ndef prints_hello():\n    """hello world"""\n    check50.run("python3 hello.py").stdout("Hello, world!", regex=False).exit(0)\n`
+const defaultCode = `import check50
+import check50_java
+
+@check50.check()
+def exists():
+    """Verify that projects file exists"""   
+    check50.exists("hello.py", "test.py")
+
+@check50.check(exists)
+def prints_hello():
+    """Verify that hello.py displays Hello, World. Depends on exists() function."""   
+    check50.run("python3 hello.py").stdout("Hello, world!", regex=False).exit(0)
+   
+`
 
 export default function CreerEvaluationPage() {
     const { user, baseAPI } = useContext(UserContext);
@@ -161,8 +174,8 @@ export default function CreerEvaluationPage() {
                                 label="Language de programmation"
                                 onChange={evt => setLanguage(evt.target.value)}
                             >
-                                <MenuItem value={"Java"}>Java</MenuItem>
                                 <MenuItem value={"Python"}>Python</MenuItem>
+                                <MenuItem value={"Java"}>Java</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
