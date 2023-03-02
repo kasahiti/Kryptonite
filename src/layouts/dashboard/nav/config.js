@@ -8,19 +8,14 @@ const icon = (name, extension) => <SvgColor src={`/assets/icons/navbar/${name}.$
 
 const navConfig = [
     {
-        title: 'Dashboard',
-        path: '/app/dashboard',
-        icon: icon('accueil', 'png'),
+        title: 'Mes évaluations',
+        path: '/app/evaluations',
+        icon: icon('evaluation', 'png'),
     },
     {
         title: 'Créer évaluation',
         path: '/app/assessment',
         icon: icon('creereval', 'png'),
-    },
-    {
-        title: 'Mes évaluations',
-        path: '/app/evaluations',
-        icon: icon('evaluation', 'png'),
     },
     {
         title: 'Administration',

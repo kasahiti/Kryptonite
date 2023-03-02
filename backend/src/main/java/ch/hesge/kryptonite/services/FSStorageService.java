@@ -98,7 +98,7 @@ public class FSStorageService implements StorageService {
      * Load and return a path to the specified filename
      *
      * @param filename the file to load
-     * @return
+     * @return a Path to file
      */
     @Override
     public Path load(String filename) {

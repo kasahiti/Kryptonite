@@ -18,7 +18,6 @@ import SimpleLayout from './layouts/simple';
 import UserPage from './pages/UserPage';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
-import DashboardAppPage from './pages/DashboardAppPage';
 import UserContext from './index';
 import UploadPage from "./pages/UploadPage";
 import AdministrationPage from "./pages/AdministrationPage";
@@ -45,7 +44,6 @@ export default function App() {
                 <Route exact path="/app" element={<PrivateRoute/>}>
                     <Route exact path="/app" element={<DashboardLayout/>}>
                         <Route element={<Navigate to="/app/dashboard"/>} index/>
-                        <Route exact path="dashboard" element={<DashboardAppPage/>}/>
                         <Route exact path="assessment" element={<CreerEvaluationPage/>}/>
                         <Route exact path="evaluations" element={<EvaluationsPage/>}/>
                         <Route exact path="evaluations/:uuid" element={<EvaluationRendusPage/>}/>
@@ -56,13 +54,12 @@ export default function App() {
                 <Route path="/assessment/:uuid" element={<UploadPage/>}/>
                 <Route exact path="login" element={<LoginPage/>}/>
                 <Route element={<SimpleLayout/>}>
-                    <Route element={<Navigate to="/app/dashboard"/>} index/>
+                    <Route element={<Navigate to="/app/evaluations"/>} index/>
                     <Route exact path="404" element={<Page404/>}/>
                     <Route exact path="*" element={<Navigate to="/404"/>}/>
                 </Route>
                 <Route path="*" element={<Navigate to="/404" replace/>}/>
             </Routes>
-
         </ThemeProvider>
     );
 }

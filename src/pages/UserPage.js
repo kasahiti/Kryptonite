@@ -3,18 +3,18 @@ import {useContext, useState} from 'react';
 
 // @mui
 import {
-  Button,
-  Collapse,
-  Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
+    Button,
+    Collapse,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle, Grid,
+    IconButton,
+    Stack,
+    TextField,
+    Typography,
 } from '@mui/material';
 
 // mock
@@ -74,7 +74,42 @@ export default function UserPage() {
                     </Typography>
                 </Stack>
 
-                <Button variant='outlined' onClick={handleClickOpen}>Changer le mot de passe</Button>
+                <Grid container direction="column" spacing={2} sx={{mt:2, mb:2}}>
+                    <Grid item xs={4}>
+                        <TextField
+                            disabled
+                            id="outlined-disabled"
+                            label="Prénom"
+                            defaultValue="Hello World"
+                            sx={{width: "300px"}}
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <TextField
+                            disabled
+                            id="outlined-disabled"
+                            label="Nom"
+                            defaultValue="Hello World"
+                            sx={{width: "300px"}}
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <TextField
+                            disabled
+                            id="outlined-disabled"
+                            label="Email"
+                            defaultValue="Hello World"
+                            sx={{width: "300px"}}
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Button variant='text' sx={{mr: 2}}>Modifier</Button>
+                        <Button variant='contained' disabled sx={{mr: 2}}>Enregistrer</Button>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Button variant='outlined' onClick={handleClickOpen}>Changer le mot de passe</Button>
+                    </Grid>
+                </Grid>
 
                 <Dialog open={open} onClose={handleCancel}>
                     <DialogTitle>Modification du mot de passe</DialogTitle>
