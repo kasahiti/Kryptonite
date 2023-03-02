@@ -16,7 +16,7 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (localStorage.getItem("user") === null) {
-    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: ''}));
+    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: ''}));
 }
 
 const UserContext = createContext(localStorage.getItem('user'));
@@ -28,12 +28,14 @@ const UserProvider = ({children}) => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
     const clearUser = () => {
-        localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: ''}));
+        localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: ''}));
 
         setUser({
             email: '',
             password: '',
             auth: false,
+            firstName: '',
+            lastName: ''
         });
     }
 
@@ -47,7 +49,15 @@ const UserProvider = ({children}) => {
         })
             .then((response) => {
                 setUser({email, auth: true, token: response.data.token});
-                localStorage.setItem('user', JSON.stringify({email, auth: true, token: response.data.token}));
+                localStorage.setItem(
+                    'user',
+                    JSON.stringify({
+                        email,
+                        auth: true,
+                        token: response.data.token,
+                        firstName: response.data.firstName,
+                        lastName: response.data.lastName}
+                    ));
                 return true;
             })
             .catch(() => false);
@@ -69,8 +79,13 @@ const UserProvider = ({children}) => {
             .catch(() => false)
     }
 
+    const modifyDetails = (fname, lname, mail) => {
+        localStorage.setItem('user', JSON.stringify({...user, firstName: fname, lastName: lname, email: mail}));
+        setUser(JSON.parse(localStorage.getItem('user')))
+    }
+
     return (
-        <UserContext.Provider value={{user, login, logout, changePassword, baseAPI}}>
+        <UserContext.Provider value={{user, login, logout, changePassword, modifyDetails, baseAPI}}>
             {children}
         </UserContext.Provider>
     );

@@ -1,5 +1,5 @@
 import {Helmet} from 'react-helmet-async';
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 
 // @mui
 import {
@@ -24,6 +24,8 @@ import UserContext from '../index';
 
 
 export default function UserPage() {
+    const { user, modifyDetails } = useContext(UserContext);
+
     const [open, setOpen] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertSeverity, setSeverity] = useState('error')
@@ -34,6 +36,12 @@ export default function UserPage() {
 
     const [disabled, setDisabled] = useState(true);
     const [modifyText, setModifyText] = useState("Modifier");
+
+
+
+    const [firstName, setFirstName] = useState(user.firstName);
+    const [lastName, setLastName] = useState(user.lastName);
+    const [email, setEmail] = useState(user.email);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -50,7 +58,16 @@ export default function UserPage() {
         } else {
             setDisabled(true);
             setModifyText("Modifier")
+            setFirstName(user.firstName)
+            setLastName(user.lastName)
+            setEmail(user.email)
         }
+    }
+
+    const handleSave = () => {
+        modifyDetails(firstName, lastName, email)
+        setDisabled(true)
+        setModifyText("Modifier")
     }
 
     const handleChangePassword = () => {
@@ -93,7 +110,8 @@ export default function UserPage() {
                             disabled={disabled}
                             id="outlined-disabled"
                             label="Prénom"
-                            defaultValue="Hello World"
+                            value={firstName}
+                            onChange={(evt) => setFirstName(evt.target.value)}
                             sx={{width: "300px"}}
                         />
                     </Grid>
@@ -102,7 +120,8 @@ export default function UserPage() {
                             disabled={disabled}
                             id="outlined-disabled"
                             label="Nom"
-                            defaultValue="Hello World"
+                            value={lastName}
+                            onChange={(evt) => setLastName(evt.target.value)}
                             sx={{width: "300px"}}
                         />
                     </Grid>
@@ -111,13 +130,14 @@ export default function UserPage() {
                             disabled={disabled}
                             id="outlined-disabled"
                             label="Email"
-                            defaultValue="Hello World"
+                            value={email}
+                            onChange={(evt) => setEmail(evt.target.value)}
                             sx={{width: "300px"}}
                         />
                     </Grid>
                     <Grid item xs={4}>
                         <Button variant='text' sx={{mr: 2.5}} onClick={handleModify}>{modifyText}</Button>
-                        <Button variant='contained' disabled={disabled} sx={{mr: 2}}>Enregistrer</Button>
+                        <Button variant='contained' disabled={disabled} sx={{mr: 2}} onClick={handleSave}>Enregistrer</Button>
                     </Grid>
                     <Grid item xs={4}>
                         <Button variant='outlined' onClick={handleClickOpen}>Changer le mot de passe</Button>

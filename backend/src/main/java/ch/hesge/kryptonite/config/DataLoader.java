@@ -33,6 +33,6 @@ public class DataLoader {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void loadData() {
-        service.register(new RegisterRequest(null, null, defaultUsername, defaultPassword), Role.ROLE_ADMIN);
+        service.register(new RegisterRequest("Root", "Root", defaultUsername, defaultPassword), Role.ROLE_ADMIN);
     }
 }
