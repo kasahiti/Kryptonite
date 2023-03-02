@@ -41,7 +41,7 @@ export default function LoginForm() {
                     setPassword('');
                     navigate('/app', {replace: true});
                 } else {
-                    console.log('Erreur')
+                    console.error('Erreur')
                     setErrorMsg("Impossible de se connecter. Vérifiez votre nom d'utilisateur ou votre mot de passe");
                     setError(true);
                 }

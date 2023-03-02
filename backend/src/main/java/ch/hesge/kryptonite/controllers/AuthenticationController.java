@@ -1,7 +1,6 @@
 package ch.hesge.kryptonite.controllers;
 
 import ch.hesge.kryptonite.domain.Role;
-import ch.hesge.kryptonite.domain.StudentProject;
 import ch.hesge.kryptonite.domain.User;
 import ch.hesge.kryptonite.payload.request.AuthenticationRequest;
 import ch.hesge.kryptonite.payload.request.RegisterRequest;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Comparator;
 
 
 /**
@@ -63,16 +60,21 @@ public class AuthenticationController {
 
     @PostMapping("/modify")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<String> modifyUser(@RequestBody UserModificationRequest request) {
+    public ResponseEntity<?> modifyUser(@RequestBody UserModificationRequest request) {
         User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User userToChange = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        boolean same = loggedInUser.equals(userToChange);
 
         if (loggedInUser.getRole().equals(Role.ROLE_ADMIN) || loggedInUser.equals(userToChange)) {
             if(request.getFirstName() != null) userToChange.setFirstname(request.getFirstName());
             if(request.getLastName() != null) userToChange.setLastname(request.getLastName());
             if(request.getNewEmail() != null) userToChange.setEmail(request.getNewEmail());
             userRepository.save(userToChange);
-            return ResponseEntity.ok().body("User modified!");
+            if(same) {
+                return ResponseEntity.ok().body(service.authenticate(userToChange));
+            } else {
+                return ResponseEntity.ok().body("User changed successfully!");
+            }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the rights to access this ressource");
         }

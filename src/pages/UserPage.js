@@ -1,5 +1,5 @@
 import {Helmet} from 'react-helmet-async';
-import {useContext, useEffect, useState} from 'react';
+import {forwardRef, useContext, useState} from 'react';
 
 // @mui
 import {
@@ -11,25 +11,34 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle, Grid,
-    IconButton,
+    IconButton, Snackbar,
     Stack,
     TextField,
     Typography,
 } from '@mui/material';
 
+import MuiAlert from "@mui/material/Alert";
+
+
 // mock
-import {Alert} from '@mui/lab';
 import CloseIcon from '@mui/icons-material/Close';
 import UserContext from '../index';
+
+
+const Alert = forwardRef((props, ref) => {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 
 export default function UserPage() {
     const { user, modifyDetails } = useContext(UserContext);
 
     const [open, setOpen] = useState(false);
+
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertSeverity, setSeverity] = useState('error')
     const [msg, setMsg] = useState('');
+
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordConf, setNewPasswordConf] = useState('');
     const {changePassword} = useContext(UserContext);
@@ -37,11 +46,23 @@ export default function UserPage() {
     const [disabled, setDisabled] = useState(true);
     const [modifyText, setModifyText] = useState("Modifier");
 
-
-
     const [firstName, setFirstName] = useState(user.firstName);
     const [lastName, setLastName] = useState(user.lastName);
     const [email, setEmail] = useState(user.email);
+
+    const openSnack = (severity, message) => {
+        setSeverity(severity);
+        setMsg(message);
+        setAlertOpen(true);
+    };
+
+    const closeSnack = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setAlertOpen(false);
+    };
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -66,8 +87,18 @@ export default function UserPage() {
 
     const handleSave = () => {
         modifyDetails(firstName, lastName, email)
-        setDisabled(true)
-        setModifyText("Modifier")
+            .then((res) => {
+                if(res) {
+                    setFirstName(firstName)
+                    setLastName(lastName)
+                    setEmail(email)
+                    setDisabled(true)
+                    setModifyText("Modifier")
+                    openSnack("success", "La modification s'est déroulée avec succes !")
+                } else {
+                    openSnack("error", "Une erreur est survenue")
+                }
+            })
     }
 
     const handleChangePassword = () => {
@@ -148,8 +179,7 @@ export default function UserPage() {
                     <DialogTitle>Modification du mot de passe</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Pour changer votre mot de passe, saisissez votre mot de passe actuel et le nouveau mot de
-                            passe
+                            Pour changer votre mot de passe, saisissez votre nouveau mot de passe
                         </DialogContentText>
                         <TextField
                             margin="dense"
@@ -198,6 +228,15 @@ export default function UserPage() {
                     </DialogActions>
                 </Dialog>
             </Container>
+            <Snackbar
+                open={alertOpen}
+                autoHideDuration={10000}
+                onClose={closeSnack}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+                <Alert onClose={closeSnack} severity={alertSeverity} sx={{ width: '100%' }}>
+                    {msg}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

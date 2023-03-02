@@ -75,4 +75,15 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .build();
     }
+
+    public AuthenticationResponse authenticate(User user) {
+        var jwtToken = jwtService.generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .firstName(user.getFirstname())
+                .lastName(user.getLastname())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+    }
 }

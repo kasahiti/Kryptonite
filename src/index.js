@@ -22,7 +22,6 @@ if (localStorage.getItem("user") === null) {
 const UserContext = createContext(localStorage.getItem('user'));
 
 
-
 const UserProvider = ({children}) => {
     const baseAPI = "https://krypto-backend.adron.ch/api";
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
@@ -48,7 +47,7 @@ const UserProvider = ({children}) => {
             }
         })
             .then((response) => {
-                setUser({email, auth: true, token: response.data.token});
+                setUser({email, auth: true, token: response.data.token, firstName: response.data.firstName, lastName: response.data.lastName});
                 localStorage.setItem(
                     'user',
                     JSON.stringify({
@@ -72,16 +71,42 @@ const UserProvider = ({children}) => {
         return axios.post(`${baseAPI}/auth/password`, newPassword, {
             headers: {
                 'Content-Type': 'plain/text'
-            },
-            withCredentials: true
+            }
         })
             .then(() => true)
             .catch(() => false)
     }
 
-    const modifyDetails = (fname, lname, mail) => {
-        localStorage.setItem('user', JSON.stringify({...user, firstName: fname, lastName: lname, email: mail}));
-        setUser(JSON.parse(localStorage.getItem('user')))
+    const modifyDetails = (fName, lName, newMail) => {
+        const data = JSON.stringify({
+            "firstName": fName,
+            "lastName": lName,
+            "email": user.email,
+            "newEmail": newMail
+        });
+        
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${baseAPI}/auth/modify`,
+            headers: {
+                'Authorization': `Bearer ${user.token}`,
+                'Content-Type': 'application/json'
+            },
+            data
+        };
+
+        return axios(config)
+            .then((response) => {
+                console.log(response.data);
+                localStorage.setItem('user', JSON.stringify({...user, firstName: fName, lastName: lName, email: newMail, token: response.data.token}));
+                setUser(JSON.parse(localStorage.getItem('user')));
+                return true;
+            })
+            .catch((error) => {
+                console.error(error);
+                return false;
+            })
     }
 
     return (
