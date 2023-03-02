@@ -32,6 +32,9 @@ export default function UserPage() {
     const [newPasswordConf, setNewPasswordConf] = useState('');
     const {changePassword} = useContext(UserContext);
 
+    const [disabled, setDisabled] = useState(true);
+    const [modifyText, setModifyText] = useState("Modifier");
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -39,6 +42,16 @@ export default function UserPage() {
     const handleCancel = () => {
         setOpen(false);
     };
+
+    const handleModify = () => {
+        if(disabled) {
+            setDisabled(false)
+            setModifyText("Annuler");
+        } else {
+            setDisabled(true);
+            setModifyText("Modifier")
+        }
+    }
 
     const handleChangePassword = () => {
         if (newPassword !== newPasswordConf) {
@@ -77,7 +90,7 @@ export default function UserPage() {
                 <Grid container direction="column" spacing={2} sx={{mt:2, mb:2}}>
                     <Grid item xs={4}>
                         <TextField
-                            disabled
+                            disabled={disabled}
                             id="outlined-disabled"
                             label="Prénom"
                             defaultValue="Hello World"
@@ -86,7 +99,7 @@ export default function UserPage() {
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
-                            disabled
+                            disabled={disabled}
                             id="outlined-disabled"
                             label="Nom"
                             defaultValue="Hello World"
@@ -95,7 +108,7 @@ export default function UserPage() {
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
-                            disabled
+                            disabled={disabled}
                             id="outlined-disabled"
                             label="Email"
                             defaultValue="Hello World"
@@ -103,8 +116,8 @@ export default function UserPage() {
                         />
                     </Grid>
                     <Grid item xs={4}>
-                        <Button variant='text' sx={{mr: 2}}>Modifier</Button>
-                        <Button variant='contained' disabled sx={{mr: 2}}>Enregistrer</Button>
+                        <Button variant='text' sx={{mr: 2.5}} onClick={handleModify}>{modifyText}</Button>
+                        <Button variant='contained' disabled={disabled} sx={{mr: 2}}>Enregistrer</Button>
                     </Grid>
                     <Grid item xs={4}>
                         <Button variant='outlined' onClick={handleClickOpen}>Changer le mot de passe</Button>

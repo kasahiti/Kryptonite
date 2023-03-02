@@ -43,7 +43,7 @@ export default function App() {
             <Routes>
                 <Route exact path="/app" element={<PrivateRoute/>}>
                     <Route exact path="/app" element={<DashboardLayout/>}>
-                        <Route element={<Navigate to="/app/dashboard"/>} index/>
+                        <Route element={<Navigate to="/app/evaluations"/>} index/>
                         <Route exact path="assessment" element={<CreerEvaluationPage/>}/>
                         <Route exact path="evaluations" element={<EvaluationsPage/>}/>
                         <Route exact path="evaluations/:uuid" element={<EvaluationRendusPage/>}/>
