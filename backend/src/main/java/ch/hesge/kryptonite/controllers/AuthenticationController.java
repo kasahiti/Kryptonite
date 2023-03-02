@@ -42,6 +42,7 @@ public class AuthenticationController {
      * @return a ResponseEntity
      */
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity register(@RequestBody RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("User already exists");
