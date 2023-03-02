@@ -45,6 +45,7 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .firstName(user.getFirstname())
                 .lastName(user.getLastname())
+                .email(user.getEmail())
                 .role(user.getRole())
                 .build();
     }
@@ -70,6 +71,7 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .firstName(user.getFirstname())
                 .lastName(user.getLastname())
+                .email(user.getEmail())
                 .role(user.getRole())
                 .build();
     }
