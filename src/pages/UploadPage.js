@@ -72,6 +72,7 @@ export default function UploadPage() {
     const [file, setFile] = useState(null);
     const fileInput = createRef();
     const [errorUuid, setErrorUuid] = useState(false);
+    const [sent, setSent] = useState(false);
 
     const [open, setOpen] = useState(false);
     const [severity, setSeverity] = useState("success");
@@ -80,7 +81,6 @@ export default function UploadPage() {
     const handleFileChange = (e) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
-            console.log(file);
         }
     };
 
@@ -136,6 +136,7 @@ export default function UploadPage() {
                 console.log(JSON.stringify(response.data));
                 reset()
                 openSnack("success", "Fichier envoyé!")
+                setSent(true);
             })
             .catch(error => {
                 console.log(error);
@@ -173,7 +174,7 @@ export default function UploadPage() {
                     </StyledSection>
                 )}
 
-                {!errorUuid &&
+                {!errorUuid && !sent &&
                     <Container maxWidth="sm">
                         <StyledContent>
                             <Typography variant="h4" gutterBottom>
@@ -237,6 +238,15 @@ export default function UploadPage() {
                         <StyledContent>
                             <Typography variant="h3">
                                 Aucun projet trouvé!
+                            </Typography>
+                        </StyledContent>
+                    </Container>
+                }
+                {sent &&
+                    <Container maxWidth="sm">
+                        <StyledContent>
+                            <Typography variant="h3">
+                                Projet envoyé
                             </Typography>
                         </StyledContent>
                     </Container>

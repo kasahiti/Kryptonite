@@ -41,7 +41,7 @@ import check50_java
 @check50.check()
 def exists():
     """Verify that projects file exists"""   
-    check50.exists("hello.py", "test.py")
+    check50.exists("hello.py", "helloadvanced.py")
 
 @check50.check(exists)
 def prints_hello():
@@ -84,7 +84,6 @@ export default function CreerEvaluationPage() {
     const handleFileChange = (e) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
-            console.log(file);
         }
     };
 
