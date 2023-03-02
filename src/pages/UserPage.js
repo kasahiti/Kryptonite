@@ -4,14 +4,14 @@ import {forwardRef, useContext, useState} from 'react';
 // @mui
 import {
     Button,
-    Collapse,
     Container,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle, Grid,
-    IconButton, Snackbar,
+    DialogTitle,
+    Grid,
+    Snackbar,
     Stack,
     TextField,
     Typography,
@@ -21,7 +21,6 @@ import MuiAlert from "@mui/material/Alert";
 
 
 // mock
-import CloseIcon from '@mui/icons-material/Close';
 import UserContext from '../index';
 
 
@@ -41,7 +40,6 @@ export default function UserPage() {
 
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordConf, setNewPasswordConf] = useState('');
-    const {changePassword} = useContext(UserContext);
 
     const [disabled, setDisabled] = useState(true);
     const [modifyText, setModifyText] = useState("Modifier");
@@ -70,6 +68,9 @@ export default function UserPage() {
 
     const handleCancel = () => {
         setOpen(false);
+        setNewPassword('');
+        setNewPasswordConf('');
+        setAlertOpen(false);
     };
 
     const handleModify = () => {
@@ -107,12 +108,15 @@ export default function UserPage() {
             setSeverity('error');
             setMsg('Les novueaux mots de passes ne correpondent pas!');
         } else {
-            changePassword(newPasswordConf)
+            modifyDetails(user.firstName, user.lastName, user.email, newPasswordConf)
                 .then((res) => {
                     if (res) {
-                        setAlertOpen(true);
+                        setOpen(false);
+                        setNewPassword('');
+                        setNewPasswordConf('');
                         setSeverity('success');
                         setMsg("Le mot de passe a bien été changé !");
+                        setAlertOpen(true);
                     } else {
                         setAlertOpen(true);
                         setSeverity('error');
@@ -201,26 +205,6 @@ export default function UserPage() {
                             value={newPasswordConf}
                             onChange={(event) => setNewPasswordConf(event.target.value)}
                         />
-                        <Collapse in={alertOpen} sx={{mt: 1}}>
-                            <Alert
-                                severity={alertSeverity}
-                                action={
-                                    <IconButton
-                                        aria-label="close"
-                                        color="inherit"
-                                        size="small"
-                                        onClick={() => {
-                                            setOpen(false);
-                                        }}
-                                    >
-                                        <CloseIcon fontSize="inherit"/>
-                                    </IconButton>
-                                }
-                                sx={{mb: 2}}
-                            >
-                                {msg}
-                            </Alert>
-                        </Collapse>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCancel}>Annuler</Button>

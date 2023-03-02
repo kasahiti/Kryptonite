@@ -17,4 +17,5 @@ public class UserModificationRequest {
     private String lastName;
     private String email;
     private String newEmail;
+    private String password;
 }

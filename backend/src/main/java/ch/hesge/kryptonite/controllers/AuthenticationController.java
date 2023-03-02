@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,8 @@ public class AuthenticationController {
     private final AuthenticationService service;
 
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
 
     /**
@@ -69,6 +72,7 @@ public class AuthenticationController {
             if(request.getFirstName() != null) userToChange.setFirstname(request.getFirstName());
             if(request.getLastName() != null) userToChange.setLastname(request.getLastName());
             if(request.getNewEmail() != null) userToChange.setEmail(request.getNewEmail());
+            if(request.getPassword() != null) userToChange.setPassword(passwordEncoder.encode(request.getPassword()));
             userRepository.save(userToChange);
             if(same) {
                 return ResponseEntity.ok().body(service.authenticate(userToChange));

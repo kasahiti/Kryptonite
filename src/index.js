@@ -67,22 +67,13 @@ const UserProvider = ({children}) => {
         clearUser();
     };
 
-    const changePassword = (newPassword) => {
-        return axios.post(`${baseAPI}/auth/password`, newPassword, {
-            headers: {
-                'Content-Type': 'plain/text'
-            }
-        })
-            .then(() => true)
-            .catch(() => false)
-    }
-
-    const modifyDetails = (fName, lName, newMail) => {
+    const modifyDetails = (fName, lName, newMail, newPassword) => {
         const data = JSON.stringify({
             "firstName": fName,
             "lastName": lName,
             "email": user.email,
-            "newEmail": newMail
+            "newEmail": newMail,
+            "password": newPassword
         });
         
         const config = {
@@ -110,7 +101,7 @@ const UserProvider = ({children}) => {
     }
 
     return (
-        <UserContext.Provider value={{user, login, logout, changePassword, modifyDetails, baseAPI}}>
+        <UserContext.Provider value={{user, login, logout, modifyDetails, baseAPI}}>
             {children}
         </UserContext.Provider>
     );
