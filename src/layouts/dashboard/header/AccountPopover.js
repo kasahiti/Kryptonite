@@ -54,7 +54,7 @@ export default function AccountPopover() {
                     }),
                 }}
             >
-                <Avatar sx={{ bgcolor: deepPurple[500] }}>{user.email.charAt(0).toUpperCase()}</Avatar>
+                <Avatar sx={{ bgcolor: deepPurple[500] }}>{user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()}</Avatar>
             </IconButton>
 
             <Popover

@@ -61,7 +61,7 @@ export default function Nav({openNav, onCloseNav}) {
             <Box sx={{mb: 5, mx: 2.5}}>
                 <Link underline="none">
                     <StyledAccount>
-                        <Avatar sx={{ bgcolor: deepPurple[500] }}>{user.email.charAt(0).toUpperCase()}</Avatar>
+                        <Avatar sx={{ bgcolor: deepPurple[500] }}>{user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()}</Avatar>
 
                         <Box sx={{ml: 2}}>
                             <Typography variant="subtitle2" sx={{color: 'text.primary'}}>
