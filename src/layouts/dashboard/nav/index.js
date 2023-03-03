@@ -65,7 +65,7 @@ export default function Nav({openNav, onCloseNav}) {
 
                         <Box sx={{ml: 2}}>
                             <Typography variant="subtitle2" sx={{color: 'text.primary'}}>
-                                {user.email}
+                                {user.firstName} {user.lastName}
                             </Typography>
 
                         </Box>

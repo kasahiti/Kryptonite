@@ -28,5 +28,5 @@ server:
 jwt:
   secret: 7E5YbJQVfA8nX9cxRpM4LdHgwK6DkZioLTru2P0hNtSsmW1UzvOGCqIe3lKFj # Change this in production !
 kryptonite:
-  user: root
+  user: root@kryptonite.com
   password: Kryptonite321!
