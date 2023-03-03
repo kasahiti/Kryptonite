@@ -56,33 +56,6 @@ export default function LoginForm() {
         setUserForm(event.target.value);
     }
 
-    const handleRegistration = () => {
-        const data = JSON.stringify(
-            {
-                email: userForm,
-                password
-            }
-        );
-
-        axios.post('https://krypto-backend.adron.ch/api/auth/register', data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                console.log(response.data);
-                setError(false);
-                setSuccess(true);
-                setUserForm('');
-                setPassword('');
-            })
-            .catch(() => {
-                setSuccess(false);
-                setErrorMsg("Impossible de créer un compte. Vérifier s'il n'existe pas déjà ou réssayer plus tard !");
-                setError(true);
-            })
-    }
-
     return (
         <>
             <Stack spacing={3}>
