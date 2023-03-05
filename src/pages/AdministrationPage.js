@@ -1,6 +1,6 @@
 import {Helmet} from 'react-helmet-async';
-import {filter} from 'lodash';
-import {forwardRef, useContext, useState} from 'react';
+import {filter, sample} from 'lodash';
+import {forwardRef, useContext, useEffect, useState} from 'react';
 
 // @mui
 import {
@@ -28,6 +28,7 @@ import axios from 'axios';
 
 // components
 import {deepPurple} from "@mui/material/colors";
+import {faker} from "@faker-js/faker";
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 
@@ -35,10 +36,7 @@ import Scrollbar from '../components/scrollbar';
 import {UserListHead, UserListToolbar} from '../sections/@dashboard/user';
 
 // mock
-import USERLIST from '../_mock/user';
 import UserContext from "../index";
-
-
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +45,18 @@ const TABLE_HEAD = [
     {id: 'role', label: 'Role', alignRight: false},
     {id: ''},
 ];
+
+const localUsers = [...Array(24)].map((_, index) => ({
+    id: faker.datatype.uuid(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    name: faker.name.fullName(),
+    role: sample([
+        'User',
+        'Admin',
+    ]),
+}));
+
 
 // ----------------------------------------------------------------------
 
@@ -86,6 +96,8 @@ const Alert = forwardRef((props, ref) => {
 export default function AdministrationPage() {
     const {baseAPI, user} = useContext(UserContext);
 
+    const [users, setUsers] = useState(localUsers);
+
     const [dialogOpen, setDialogOpen] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -104,6 +116,46 @@ export default function AdministrationPage() {
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertSeverity, setSeverity] = useState('error')
     const [msg, setMsg] = useState('');
+
+    const fetchUsers = () => {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${baseAPI}/auth/users`,
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            }
+        };
+
+        axios(config)
+            .then(response => {
+                const newlist = [];
+
+                if(response.data.length > 0) {
+                    for(let i = 0; i < response.data.length; i++) {
+                        const user = response.data[i]
+                        newlist.push({
+                            id: user.id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            name: `${user.firstName} ${user.lastName}`,
+                            role: user.role
+                        });
+                    }
+                }
+
+                console.log(newlist)
+
+                setUsers(newlist);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
+    useEffect(() => {
+        fetchUsers();
+    }, [])
 
     const handleOpenMenu = (event) => {
         setOpen(event.currentTarget);
@@ -125,7 +177,7 @@ export default function AdministrationPage() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = USERLIST.map((n) => n.name);
+            const newSelecteds = users.map((n) => n.name);
             setSelected(newSelecteds);
             return;
         }
@@ -216,9 +268,9 @@ export default function AdministrationPage() {
         setFilterName(event.target.value);
     };
 
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
-    const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+    const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
 
     const isNotFound = !filteredUsers.length && !!filterName;
 
@@ -249,7 +301,7 @@ export default function AdministrationPage() {
                                     order={order}
                                     orderBy={orderBy}
                                     headLabel={TABLE_HEAD}
-                                    rowCount={USERLIST.length}
+                                    rowCount={users.length}
                                     numSelected={selected.length}
                                     onRequestSort={handleRequestSort}
                                     onSelectAllClick={handleSelectAllClick}
@@ -304,13 +356,13 @@ export default function AdministrationPage() {
                                                     }}
                                                 >
                                                     <Typography variant="h6" paragraph>
-                                                        Not found
+                                                        Aucun utilisateur trouvé
                                                     </Typography>
 
                                                     <Typography variant="body2">
-                                                        No results found for &nbsp;
+                                                        Aucun résultat pour &nbsp;
                                                         <strong>&quot;{filterName}&quot;</strong>.
-                                                        <br/> Try checking for typos or using complete words.
+                                                        <br/> Essayez avec une autre orthographe
                                                     </Typography>
                                                 </Paper>
                                             </TableCell>
@@ -324,7 +376,7 @@ export default function AdministrationPage() {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={USERLIST.length}
+                        count={users.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

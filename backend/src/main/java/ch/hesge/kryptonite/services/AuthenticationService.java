@@ -33,8 +33,8 @@ public class AuthenticationService {
      */
     public AuthenticationResponse register(RegisterRequest request, Role role) {
         var user = User.builder()
-                .firstname(request.getFirstName())
-                .lastname(request.getLastName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
@@ -43,8 +43,8 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
-                .firstName(user.getFirstname())
-                .lastName(user.getLastname())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();
@@ -69,8 +69,8 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
-                .firstName(user.getFirstname())
-                .lastName(user.getLastname())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();
@@ -80,8 +80,8 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
-                .firstName(user.getFirstname())
-                .lastName(user.getLastname())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();

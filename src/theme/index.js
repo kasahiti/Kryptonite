@@ -4,12 +4,14 @@ import {useMemo} from 'react';
 import {CssBaseline} from '@mui/material';
 import {createTheme, StyledEngineProvider, ThemeProvider as MUIThemeProvider} from '@mui/material/styles';
 //
+import {frFR} from "@mui/material/locale";
 import palette from './palette';
 import shadows from './shadows';
 import typography from './typography';
 import GlobalStyles from './globalStyles';
 import customShadows from './customShadows';
 import componentsOverride from './overrides';
+
 
 // ----------------------------------------------------------------------
 
@@ -29,7 +31,7 @@ export default function ThemeProvider({children}) {
         []
     );
 
-    const theme = createTheme(themeOptions);
+    const theme = createTheme(themeOptions, frFR);
     theme.components = componentsOverride(theme);
 
     return (

@@ -82,8 +82,8 @@ public class AuthenticationController {
         boolean same = loggedInUser.equals(userToChange);
 
         if (loggedInUser.getRole().equals(Role.ROLE_ADMIN) || loggedInUser.equals(userToChange)) {
-            if(request.getFirstName() != null) userToChange.setFirstname(request.getFirstName());
-            if(request.getLastName() != null) userToChange.setLastname(request.getLastName());
+            if(request.getFirstName() != null) userToChange.setFirstName(request.getFirstName());
+            if(request.getLastName() != null) userToChange.setLastName(request.getLastName());
             if(request.getNewEmail() != null) userToChange.setEmail(request.getNewEmail());
             if(request.getPassword() != null) userToChange.setPassword(passwordEncoder.encode(request.getPassword()));
             userRepository.save(userToChange);
@@ -96,4 +96,6 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the rights to access this ressource");
         }
     }
+
+    // delete..
 }
