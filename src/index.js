@@ -16,7 +16,7 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (localStorage.getItem("user") === null) {
-    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: '', role: ''}));
+    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: '', role: '', id: ''}));
 }
 
 const UserContext = createContext(localStorage.getItem('user'));
@@ -27,7 +27,7 @@ const UserProvider = ({children}) => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
     const clearUser = () => {
-        localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: '', role: ''}));
+        localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: '', role: '', id: ''}));
 
         setUser({
             email: '',
@@ -35,7 +35,8 @@ const UserProvider = ({children}) => {
             auth: false,
             firstName: '',
             lastName: '',
-            role: ''
+            role: '',
+            id: ''
         });
     }
 
@@ -54,7 +55,8 @@ const UserProvider = ({children}) => {
                     token: response.data.token,
                     firstName: response.data.firstName,
                     lastName: response.data.lastName,
-                    role: response.data.role
+                    role: response.data.role,
+                    id: response.data.id
                 });
                 localStorage.setItem(
                     'user',
@@ -64,7 +66,8 @@ const UserProvider = ({children}) => {
                         token: response.data.token,
                         firstName: response.data.firstName,
                         lastName: response.data.lastName,
-                        role: response.data.role
+                        role: response.data.role,
+                        id: response.data.id
                     }));
                 return true;
             })
@@ -76,19 +79,20 @@ const UserProvider = ({children}) => {
         clearUser();
     };
 
-    const modifyDetails = (fName, lName, newMail, newPassword) => {
+    const modifyDetails = (fName, lName, oldMail, newMail, newPassword, role, id) => {
         const data = JSON.stringify({
             "firstName": fName,
             "lastName": lName,
-            "email": user.email,
+            "email": oldMail,
             "newEmail": newMail,
+            "role": role,
             "password": newPassword
         });
         
         const config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `${baseAPI}/auth/modify`,
+            url: `${baseAPI}/users/${id}`,
             headers: {
                 'Authorization': `Bearer ${user.token}`,
                 'Content-Type': 'application/json'
@@ -98,9 +102,10 @@ const UserProvider = ({children}) => {
 
         return axios(config)
             .then((response) => {
-                console.log(response.data);
-                localStorage.setItem('user', JSON.stringify({...user, firstName: fName, lastName: lName, email: newMail, token: response.data.token}));
-                setUser(JSON.parse(localStorage.getItem('user')));
+                if(response.data.token !== undefined) {
+                    localStorage.setItem('user', JSON.stringify({...user, firstName: fName, lastName: lName, email: newMail, token: response.data.token}));
+                    setUser(JSON.parse(localStorage.getItem('user')));
+                }
                 return true;
             })
             .catch((error) => {

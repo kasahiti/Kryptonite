@@ -1,5 +1,6 @@
 package ch.hesge.kryptonite.payload.request;
 
+import ch.hesge.kryptonite.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class UserModificationRequest {
     private String email;
     private String newEmail;
     private String password;
+    private Role role;
 }

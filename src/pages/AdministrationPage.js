@@ -8,11 +8,11 @@ import {
     Button,
     Card,
     Checkbox,
-    Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid,
-    IconButton,
+    Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid,
+    IconButton, InputLabel,
     MenuItem,
     Paper,
-    Popover, Snackbar,
+    Popover, Select, Snackbar,
     Stack,
     Table,
     TableBody,
@@ -42,20 +42,13 @@ import UserContext from "../index";
 
 const TABLE_HEAD = [
     {id: 'name', label: 'Prénom Nom', alignRight: false},
+    {id: 'id', label: 'ID', alignRight: false},
+    {id: 'email', label: 'Email / Nom d\'utilisateur', alignRight: false},
     {id: 'role', label: 'Role', alignRight: false},
     {id: ''},
 ];
 
-const localUsers = [...Array(24)].map((_, index) => ({
-    id: faker.datatype.uuid(),
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    name: faker.name.fullName(),
-    role: sample([
-        'User',
-        'Admin',
-    ]),
-}));
+const localUsers = [];
 
 
 // ----------------------------------------------------------------------
@@ -94,14 +87,17 @@ const Alert = forwardRef((props, ref) => {
 });
 
 export default function AdministrationPage() {
-    const {baseAPI, user} = useContext(UserContext);
+    const {baseAPI, user, modifyDetails} = useContext(UserContext);
 
     const [users, setUsers] = useState(localUsers);
+    const [selectedUser, setSelectedUser] = useState({firstName: null, lastName: null, email: null, role: null});
 
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogModifyOpen, setDialogModifyOpen] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+    const [role, setRole] = useState("");
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordConf, setNewPasswordConf] = useState('');
 
@@ -121,7 +117,7 @@ export default function AdministrationPage() {
         const config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: `${baseAPI}/auth/users`,
+            url: `${baseAPI}/users`,
             headers: {
                 'Authorization': `Bearer ${user.token}`
             }
@@ -139,13 +135,11 @@ export default function AdministrationPage() {
                             firstName: user.firstName,
                             lastName: user.lastName,
                             name: `${user.firstName} ${user.lastName}`,
-                            role: user.role
+                            role: user.role,
+                            email: user.email
                         });
                     }
                 }
-
-                console.log(newlist)
-
                 setUsers(newlist);
             })
             .catch(error => {
@@ -153,12 +147,42 @@ export default function AdministrationPage() {
             })
     }
 
+    const deleteUser = (evt, id) => {
+        const config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${baseAPI}/users/${id}`,
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            }
+        };
+
+        axios(config)
+            .then(response => {
+                openSnack("success", "Utilisateur(s) supprimé(s) avec succès !")
+                setSelected([]);
+                setOpen(null);
+                fetchUsers();
+            })
+            .catch(error => {
+                openSnack("error", "Une erreur est survenue, impossible de supprimer le(s) utilisateur(s) !")
+                console.log(error);
+            })
+    }
+
     useEffect(() => {
         fetchUsers();
+
+        const intervalId = setInterval(() => {
+            fetchUsers()
+        }, 5000)
+
+        return () => clearInterval(intervalId);
     }, [])
 
-    const handleOpenMenu = (event) => {
+    const handleOpenMenu = (event, user) => {
         setOpen(event.currentTarget);
+        setSelectedUser(user);
     };
 
     const handleCloseMenu = () => {
@@ -166,7 +190,14 @@ export default function AdministrationPage() {
     };
 
     const handleCancelDialog = () => {
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setRole('');
+        setNewPasswordConf('');
+        setNewPassword('');
         setDialogOpen(false);
+        setDialogModifyOpen(false);
     };
 
     const handleRequestSort = (event, property) => {
@@ -177,7 +208,7 @@ export default function AdministrationPage() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = users.map((n) => n.name);
+            const newSelecteds = users.map((n) => n.id);
             setSelected(newSelecteds);
             return;
         }
@@ -207,7 +238,8 @@ export default function AdministrationPage() {
                 "email": email,
                 "firstName": firstName,
                 "lastName": lastName,
-                "password": newPassword
+                "password": newPassword,
+                "role": role
             });
 
             const config = {
@@ -223,27 +255,54 @@ export default function AdministrationPage() {
 
             axios(config)
                 .then(response => {
-                    console.log(JSON.stringify(response.data));
-
                     setFirstName("");
                     setLastName("");
                     setEmail("");
                     setNewPassword("");
                     setNewPasswordConf("");
-                    setDialogOpen(false)
-                    openSnack("success", "L'utilisateur a été créé avec succès!");
+                    setDialogOpen(false);
+                    openSnack("success", "L'utilisateur a été créé avec succès !");
+                    fetchUsers();
                 })
                 .catch(error => {
-                    console.log(error);
+                    openSnack("error", "L'utilisateur existe déjà !");
                 })
         }
     }
 
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleModifyUser = () => {
+        if(newPasswordConf !== newPassword) {
+            openSnack("error", "Les nouveaux mots de passes ne correspondent pas !");
+        } else {
+            modifyDetails(firstName, lastName, selectedUser.email, email, newPasswordConf, role, selectedUser.id)
+                .then((res) => {
+                    if (res) {
+                        setOpen(false);
+                        setNewPassword('');
+                        setNewPasswordConf('');
+                        openSnack("success", "L'utilisateur a bien été modifié !")
+                        handleCancelDialog();
+                        fetchUsers();
+                    } else {
+                        openSnack("error", "L'utilisateur n'a pas pu être modifié !")
+                    }
+                })
+        }
+    }
+
+    const handleModifyDialog = () => {
+        setFirstName(selectedUser.firstName);
+        setLastName(selectedUser.lastName);
+        setEmail(selectedUser.email);
+        setRole(selectedUser.role);
+        setDialogModifyOpen(true);
+    }
+
+    const handleClick = (event, id) => {
+        const selectedIndex = selected.indexOf(id);
         let newSelected = [];
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, id);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -283,7 +342,7 @@ export default function AdministrationPage() {
             <Container>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
-                        Utilisateurs
+                        Gestion des utilisateurs
                     </Typography>
                     <Button variant="contained" onClick={() => setDialogOpen(true)} startIcon={<Iconify icon="eva:plus-fill"/>}>
                         Nouvel utilisateur
@@ -291,8 +350,7 @@ export default function AdministrationPage() {
                 </Stack>
 
                 <Card>
-                    <UserListToolbar numSelected={selected.length} filterName={filterName}
-                                     onFilterName={handleFilterByName}/>
+                    <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} deleteUser={deleteUser} users={selected} />
 
                     <Scrollbar>
                         <TableContainer sx={{minWidth: 800}}>
@@ -308,15 +366,13 @@ export default function AdministrationPage() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const {id, firstName, lastName, name, role, company, avatarUrl} = row;
-                                        const selectedUser = selected.indexOf(name) !== -1;
+                                        const {id, firstName, lastName, name, role, email} = row;
+                                        const selectedUser = selected.indexOf(id) !== -1;
 
                                         return (
-                                            <TableRow hover key={id} tabIndex={-1} role="checkbox"
-                                                      selected={selectedUser}>
+                                            <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                                                 <TableCell padding="checkbox">
-                                                    <Checkbox checked={selectedUser}
-                                                              onChange={(event) => handleClick(event, name)}/>
+                                                    <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)}/>
                                                 </TableCell>
 
                                                 <TableCell component="th" scope="row" padding="none">
@@ -329,10 +385,14 @@ export default function AdministrationPage() {
                                                     </Stack>
                                                 </TableCell>
 
-                                                <TableCell align="left">{role}</TableCell>
+                                                <TableCell align="left">{id}</TableCell>
+
+                                                <TableCell align="left">{email}</TableCell>
+
+                                                <TableCell align="left">{role.includes("ADMIN") ? "Administrateur" : "Utilisateur"}</TableCell>
 
                                                 <TableCell align="right">
-                                                    <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                                                    <IconButton size="large" color="inherit" onClick={(evt) => handleOpenMenu(evt, row)}>
                                                         <Iconify icon={'eva:more-vertical-fill'}/>
                                                     </IconButton>
                                                 </TableCell>
@@ -381,6 +441,10 @@ export default function AdministrationPage() {
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
+                        labelDisplayedRows={({from, to, count, page}) => {
+                            return `${from}-${to} sur ${count}`
+                        }}
+                        labelRowsPerPage={"Lignes par page :"}
                     />
                 </Card>
             </Container>
@@ -390,8 +454,8 @@ export default function AdministrationPage() {
                 <DialogContent>
                     <DialogContentText>
                         Pour créer un utilisateur, veuillez saisir les informations suivantes :
-                        <Grid container direction="column" spacing={2} sx={{mt:2, mb:2}}>
-                            <Grid item xs={12}>
+                        <Grid container direction="row" justifyContent={"space-between"} spacing={2} sx={{mt:2, mb:2}}>
+                            <Grid item xs={6}>
                                 <TextField
                                     fullWidth
                                     required
@@ -400,7 +464,7 @@ export default function AdministrationPage() {
                                     onChange={(evt) => setFirstName(evt.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={6}>
                                 <TextField
                                     fullWidth
                                     required
@@ -409,7 +473,7 @@ export default function AdministrationPage() {
                                     onChange={(evt) => setLastName(evt.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={6}>
                                 <TextField
                                     fullWidth
                                     required
@@ -418,18 +482,33 @@ export default function AdministrationPage() {
                                     onChange={(evt) => setEmail(evt.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="language-label">Role *</InputLabel>
+                                    <Select
+                                        required
+                                        labelId="language-label"
+                                        value={role}
+                                        label="Role"
+                                        onChange={evt => setRole(evt.target.value)}
+                                    >
+                                        <MenuItem value={"ROLE_USER"}>Utilisateur</MenuItem>
+                                        <MenuItem value={"ROLE_ADMIN"}>Administrateur</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
                                 <TextField
                                     fullWidth
                                     required
                                     margin="dense"
-                                    label="Nouveau mot de passe"
+                                    label="Mot de passe"
                                     type="password"
                                     value={newPassword}
                                     onChange={(event) => setNewPassword(event.target.value)}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={6}>
                                 <TextField
                                     required
                                     margin="dense"
@@ -446,6 +525,86 @@ export default function AdministrationPage() {
                 <DialogActions>
                     <Button onClick={handleCancelDialog}>Annuler</Button>
                     <Button onClick={handleRegistration}>Créer</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={dialogModifyOpen} onClose={handleCancelDialog}>
+                <DialogTitle>Modification utilisateur</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Modifier l'utilisateur :
+                        <Grid container direction="row" justifyContent={"space-between"} spacing={2} sx={{mt:2, mb:2}}>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Prénom"
+                                    value={firstName}
+                                    onChange={(evt) => setFirstName(evt.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Nom"
+                                    value={lastName}
+                                    onChange={(evt) => setLastName(evt.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Email"
+                                    value={email}
+                                    onChange={(evt) => setEmail(evt.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="language-label">Role *</InputLabel>
+                                    <Select
+                                        required
+                                        labelId="language-label"
+                                        value={role}
+                                        label="Role"
+                                        onChange={evt => setRole(evt.target.value)}
+                                    >
+                                        <MenuItem value={"ROLE_USER"}>Utilisateur</MenuItem>
+                                        <MenuItem value={"ROLE_ADMIN"}>Administrateur</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    margin="dense"
+                                    label="Mot de passe (optionnel)"
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(event) => setNewPassword(event.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    margin="dense"
+                                    label="Confirmer le mot de passe"
+                                    type="password"
+                                    fullWidth
+                                    value={newPasswordConf}
+                                    onChange={(event) => setNewPasswordConf(event.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography>La saisie d'un nouveau mot de passe est facultative. Pour changer le mot de passe, remplissez les deux champs.</Typography>
+                            </Grid>
+                        </Grid>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDialog}>Annuler</Button>
+                    <Button onClick={handleModifyUser}>Modifier</Button>
                 </DialogActions>
             </Dialog>
 
@@ -467,12 +626,12 @@ export default function AdministrationPage() {
                     },
                 }}
             >
-                <MenuItem>
+                <MenuItem onClick={handleModifyDialog}>
                     <Iconify icon={'eva:edit-fill'} sx={{mr: 2}}/>
                     Editer
                 </MenuItem>
 
-                <MenuItem sx={{color: 'error.main'}}>
+                <MenuItem sx={{color: 'error.main'}} onClick={(evt) => deleteUser(evt, selectedUser.id)}>
                     <Iconify icon={'eva:trash-2-outline'} sx={{mr: 2}}/>
                     Supprimer
                 </MenuItem>

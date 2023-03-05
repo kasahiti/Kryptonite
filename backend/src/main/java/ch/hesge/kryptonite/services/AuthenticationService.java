@@ -28,21 +28,18 @@ public class AuthenticationService {
      * Creates and saves a new User to the repository. It also generates a new JWT token using the JwtService.
      *
      * @param request The registration request containing the user's information.
-     * @param role    The user's role
      * @return An AuthenticationResponse containing the JWT token.
      */
-    public AuthenticationResponse register(RegisterRequest request, Role role) {
+    public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(role)
+                .role(request.getRole())
                 .build();
         repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
-                .token(jwtToken)
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
@@ -73,6 +70,7 @@ public class AuthenticationService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .id(user.getId())
                 .build();
     }
 

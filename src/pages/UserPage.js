@@ -87,7 +87,7 @@ export default function UserPage() {
     }
 
     const handleSave = () => {
-        modifyDetails(firstName, lastName, email)
+        modifyDetails(firstName, lastName, user.email, email, null, null, user.id)
             .then((res) => {
                 if(res) {
                     setFirstName(firstName)
@@ -95,32 +95,26 @@ export default function UserPage() {
                     setEmail(email)
                     setDisabled(true)
                     setModifyText("Modifier")
-                    openSnack("success", "La modification s'est déroulée avec succes !")
+                    openSnack("success", "La modification s'est déroulée avec succes !");
                 } else {
-                    openSnack("error", "Une erreur est survenue")
+                    openSnack("error", "Une erreur est survenue");
                 }
             })
     }
 
     const handleChangePassword = () => {
         if (newPassword !== newPasswordConf) {
-            setAlertOpen(true);
-            setSeverity('error');
-            setMsg('Les novueaux mots de passes ne correpondent pas!');
+            openSnack("error", "Les novueaux mots de passes ne correpondent pas!");
         } else {
-            modifyDetails(user.firstName, user.lastName, user.email, newPasswordConf)
+            modifyDetails(null, null, user.email, null, newPassword, user.id)
                 .then((res) => {
                     if (res) {
                         setOpen(false);
                         setNewPassword('');
                         setNewPasswordConf('');
-                        setSeverity('success');
-                        setMsg("Le mot de passe a bien été changé !");
-                        setAlertOpen(true);
+                        openSnack("success", "Le mot de passe a bien été changé !");
                     } else {
-                        setAlertOpen(true);
-                        setSeverity('error');
-                        setMsg("Le mot de passe n'as pas pu être changé pour une raison inconnue !");
+                        openSnack("error", "Le mot de passe n'as pas pu être changé pour une raison inconnue !");
                     }
                 })
         }
@@ -164,7 +158,7 @@ export default function UserPage() {
                         <TextField
                             disabled={disabled}
                             id="outlined-disabled"
-                            label="Email"
+                            label="Email / Nom d'utilisateur"
                             value={email}
                             onChange={(evt) => setEmail(evt.target.value)}
                             sx={{width: "300px"}}
