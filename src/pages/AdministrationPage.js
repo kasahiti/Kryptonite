@@ -1,6 +1,6 @@
 import {Helmet} from 'react-helmet-async';
 import {filter} from 'lodash';
-import {useState} from 'react';
+import {forwardRef, useContext, useState} from 'react';
 
 // @mui
 import {
@@ -8,22 +8,26 @@ import {
     Button,
     Card,
     Checkbox,
-    Container,
+    Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid,
     IconButton,
     MenuItem,
     Paper,
-    Popover,
+    Popover, Snackbar,
     Stack,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TablePagination,
-    TableRow,
+    TableRow, TextField,
     Typography,
 } from '@mui/material';
+import MuiAlert from "@mui/material/Alert";
+
+import axios from 'axios';
 
 // components
+import {deepPurple} from "@mui/material/colors";
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 
@@ -32,11 +36,14 @@ import {UserListHead, UserListToolbar} from '../sections/@dashboard/user';
 
 // mock
 import USERLIST from '../_mock/user';
+import UserContext from "../index";
+
+
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-    {id: 'name', label: 'Name', alignRight: false},
+    {id: 'name', label: 'Prénom Nom', alignRight: false},
     {id: 'role', label: 'Role', alignRight: false},
     {id: ''},
 ];
@@ -72,20 +79,31 @@ function applySortFilter(array, comparator, query) {
     return stabilizedThis.map((el) => el[0]);
 }
 
+const Alert = forwardRef((props, ref) => {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 export default function AdministrationPage() {
+    const {baseAPI, user} = useContext(UserContext);
+
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordConf, setNewPasswordConf] = useState('');
+
     const [open, setOpen] = useState(null);
-
     const [page, setPage] = useState(0);
-
     const [order, setOrder] = useState('asc');
-
     const [selected, setSelected] = useState([]);
-
     const [orderBy, setOrderBy] = useState('name');
-
     const [filterName, setFilterName] = useState('');
-
     const [rowsPerPage, setRowsPerPage] = useState(5);
+
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertSeverity, setSeverity] = useState('error')
+    const [msg, setMsg] = useState('');
 
     const handleOpenMenu = (event) => {
         setOpen(event.currentTarget);
@@ -93,6 +111,10 @@ export default function AdministrationPage() {
 
     const handleCloseMenu = () => {
         setOpen(null);
+    };
+
+    const handleCancelDialog = () => {
+        setDialogOpen(false);
     };
 
     const handleRequestSort = (event, property) => {
@@ -110,6 +132,60 @@ export default function AdministrationPage() {
         setSelected([]);
     };
 
+    const openSnack = (severity, message) => {
+        setSeverity(severity);
+        setMsg(message);
+        setAlertOpen(true);
+    };
+
+    const closeSnack = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setAlertOpen(false);
+    };
+
+    const handleRegistration = () => {
+        if(firstName.length === 0 || lastName.length === 0 || email.length === 0 || newPassword.length === 0 || newPasswordConf.length === 0) {
+            openSnack("error", "Il manque un ou plusieurs champs obligatoires !");
+        } else if (newPasswordConf !== newPassword) {
+            openSnack("error", "Les mots de passe ne correspondent pas !");
+        } else {
+            const data = JSON.stringify({
+                "email": email,
+                "firstName": firstName,
+                "lastName": lastName,
+                "password": newPassword
+            });
+
+            const config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: `${baseAPI}/auth/register`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                },
+                data
+            };
+
+            axios(config)
+                .then(response => {
+                    console.log(JSON.stringify(response.data));
+
+                    setFirstName("");
+                    setLastName("");
+                    setEmail("");
+                    setNewPassword("");
+                    setNewPasswordConf("");
+                    setDialogOpen(false)
+                    openSnack("success", "L'utilisateur a été créé avec succès!");
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        }
+    }
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -157,7 +233,7 @@ export default function AdministrationPage() {
                     <Typography variant="h4" gutterBottom>
                         Utilisateurs
                     </Typography>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill"/>}>
+                    <Button variant="contained" onClick={() => setDialogOpen(true)} startIcon={<Iconify icon="eva:plus-fill"/>}>
                         Nouvel utilisateur
                     </Button>
                 </Stack>
@@ -180,7 +256,7 @@ export default function AdministrationPage() {
                                 />
                                 <TableBody>
                                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                        const {id, name, role, company, avatarUrl} = row;
+                                        const {id, firstName, lastName, name, role, company, avatarUrl} = row;
                                         const selectedUser = selected.indexOf(name) !== -1;
 
                                         return (
@@ -193,7 +269,8 @@ export default function AdministrationPage() {
 
                                                 <TableCell component="th" scope="row" padding="none">
                                                     <Stack direction="row" alignItems="center" spacing={2}>
-                                                        <Avatar alt={name} src={avatarUrl}/>
+                                                        <Avatar sx={{ bgcolor: deepPurple[500] }}>{firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase()}</Avatar>
+
                                                         <Typography variant="subtitle2" noWrap>
                                                             {name}
                                                         </Typography>
@@ -256,6 +333,70 @@ export default function AdministrationPage() {
                 </Card>
             </Container>
 
+            <Dialog open={dialogOpen} onClose={handleCancelDialog}>
+                <DialogTitle>Nouvel utilisateur</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Pour créer un utilisateur, veuillez saisir les informations suivantes :
+                        <Grid container direction="column" spacing={2} sx={{mt:2, mb:2}}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Prénom"
+                                    value={firstName}
+                                    onChange={(evt) => setFirstName(evt.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Nom"
+                                    value={lastName}
+                                    onChange={(evt) => setLastName(evt.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Email"
+                                    value={email}
+                                    onChange={(evt) => setEmail(evt.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    margin="dense"
+                                    label="Nouveau mot de passe"
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(event) => setNewPassword(event.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    margin="dense"
+                                    label="Confirmer le mot de passe"
+                                    type="password"
+                                    fullWidth
+                                    value={newPasswordConf}
+                                    onChange={(event) => setNewPasswordConf(event.target.value)}
+                                />
+                            </Grid>
+                        </Grid>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDialog}>Annuler</Button>
+                    <Button onClick={handleRegistration}>Créer</Button>
+                </DialogActions>
+            </Dialog>
+
             <Popover
                 open={Boolean(open)}
                 anchorEl={open}
@@ -284,6 +425,16 @@ export default function AdministrationPage() {
                     Supprimer
                 </MenuItem>
             </Popover>
+
+            <Snackbar
+                open={alertOpen}
+                autoHideDuration={10000}
+                onClose={closeSnack}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+                <Alert onClose={closeSnack} severity={alertSeverity} sx={{ width: '100%' }}>
+                    {msg}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

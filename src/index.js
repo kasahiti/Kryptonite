@@ -16,7 +16,7 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (localStorage.getItem("user") === null) {
-    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: ''}));
+    localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: '', role: ''}));
 }
 
 const UserContext = createContext(localStorage.getItem('user'));
@@ -27,14 +27,15 @@ const UserProvider = ({children}) => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
     const clearUser = () => {
-        localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: ''}));
+        localStorage.setItem('user', JSON.stringify({email: '', auth: false, token: '', firstName: '', lastName: '', role: ''}));
 
         setUser({
             email: '',
             password: '',
             auth: false,
             firstName: '',
-            lastName: ''
+            lastName: '',
+            role: ''
         });
     }
 
@@ -47,7 +48,14 @@ const UserProvider = ({children}) => {
             }
         })
             .then((response) => {
-                setUser({email, auth: true, token: response.data.token, firstName: response.data.firstName, lastName: response.data.lastName});
+                setUser({
+                    email,
+                    auth: true,
+                    token: response.data.token,
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    role: response.data.role
+                });
                 localStorage.setItem(
                     'user',
                     JSON.stringify({
@@ -55,8 +63,9 @@ const UserProvider = ({children}) => {
                         auth: true,
                         token: response.data.token,
                         firstName: response.data.firstName,
-                        lastName: response.data.lastName}
-                    ));
+                        lastName: response.data.lastName,
+                        role: response.data.role
+                    }));
                 return true;
             })
             .catch(() => false);

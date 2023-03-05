@@ -27,25 +27,35 @@ public class JobScheduler {
      * Retrieve all student projects with JobStatus=NOT_STARTED. If there's any, takes the first, and perform check50
      * on it, stores the json result in it, changes the status and save the changes using the repository
      */
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 20000)
     public void startCorrection() {
         log.info("Performing automatic checks");
 
         List<StudentProject> projects = repository.findByStatus(JobStatus.NOT_STARTED).get();
         if (!projects.isEmpty()) {
-            log.info("Performing check50 on student's project...");
             StudentProject project = projects.get(0);
             project.setStatus(JobStatus.STARTED);
             repository.save(project);
 
-            String output = TerminalRunner.shell(
+            log.info("Performing check50 on student's project...");
+            String check50 = TerminalRunner.shell(
                     "check50",
                     project.getPathFS(),
                     "--dev", project.getAssessment().getCheck50DataPath(),
                     "-o", "json"
             );
 
-            project.setJsonResults(output);
+            log.info("Performing style50 on student's project...");
+            // Use bash to correctly interpret the wildcard
+            String style50 = TerminalRunner.shell(
+                    "bash",
+                    project.getPathFS(),
+                    "-c",
+                    "style50 -o json *.*"
+            );
+
+            project.setCheck50Results(check50);
+            project.setStyle50Results(style50);
             project.setStatus(JobStatus.DONE);
             repository.save(project);
             log.info("Check50 done.");

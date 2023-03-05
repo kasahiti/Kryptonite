@@ -14,10 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -48,6 +47,20 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("User already exists");
         }
         return ResponseEntity.ok(service.register(request, Role.ROLE_USER));
+    }
+
+    /**
+     * HTTP endpoint for fetching all users.
+     *
+     * @return a ResponseEntity
+     */
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> fetchAll() {
+        List<User> users = userRepository.findAll();
+        users.remove((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        return ResponseEntity.ok().body(users);
     }
 
     /**

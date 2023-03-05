@@ -64,6 +64,12 @@ export default function LoginForm() {
                     label="Nom d'utiliasteur"
                     value={userForm}
                     onChange={handleUser}
+                    onKeyDown={(ev) => {
+                        if (ev.key === 'Enter') {
+                            ev.preventDefault();
+                            handleClick();
+                        }
+                    }}
                 />
 
                 <TextField

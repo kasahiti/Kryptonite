@@ -25,7 +25,10 @@ public class StudentProject {
     private Assessment assessment;
 
     @Lob
-    private String jsonResults;
+    private String check50Results;
+
+    @Lob
+    private String style50Results;
 
     private String firstName;
     private String lastName;

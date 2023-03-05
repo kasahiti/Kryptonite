@@ -4,17 +4,15 @@ import {Helmet} from 'react-helmet-async';
 
 import {
     Container,
-    Paper,
     Stack,
     Typography,
     Grid,
-    Button,
-    Fab,
-    Snackbar,
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Chip, Tab, Tabs, Box
+    Chip,
+    Divider,
+    Button
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MuiAlert from "@mui/material/Alert";
@@ -84,6 +82,33 @@ export default function EvaluationRendusPage() {
             })
     }
 
+    const downloadProject = (studentId, firstName, lastName) => {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${baseAPI}/files/${uuid}/${studentId}`,
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            },
+            responseType: 'blob'
+        };
+
+        axios(config)
+            .then(response => {
+                const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                const fURL = document.createElement('a');
+
+                fURL.href = fileURL;
+                fURL.setAttribute(`download`, `${firstName}-${lastName}.zip`);
+                document.body.appendChild(fURL);
+
+                fURL.click();
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
     useEffect(() => {
         getProjects()
         getByUUID();
@@ -134,23 +159,53 @@ export default function EvaluationRendusPage() {
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <Grid container spacing={2} justifyContent="center" alignItems="center">
-                                            {project.jsonResults && !JSON.parse(project.jsonResults).error && JSON.parse(project.jsonResults).results.map((result) => (
+                                            <Grid item sx={{mt: 2}} xs={5} textAlign={"right"}>
+                                                Lien du rendu
+                                            </Grid>
+                                            <Grid item sx={{mt: 2}} xs={7} textAlign={"left"}>
+                                                <Button onClick={(evt) => downloadProject(project.id, project.firstName, project.lastName)}>Télécharger</Button>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Divider/>
+                                            </Grid>
+                                            {project.check50Results && !JSON.parse(project.check50Results).error && JSON.parse(project.check50Results).results.map((result) => (
                                                 <>
                                                     <Grid item sx={{mt: 2}} xs={5} textAlign={"right"}>
                                                         <Typography variant="h5" color={result.passed ? "success.main" : "error.main"}>Check : {result.name}</Typography>
                                                     </Grid>
                                                     <Grid item sx={{mt: 2}} xs={7} textAlign={"left"}>
                                                         <Typography variant="body1"><b>Description</b> : {result.description}</Typography>
-                                                        <Typography variant="body1"><b>Check result</b> : {result.passed ? 'Passed' : 'Failed'}</Typography>
+                                                        <Typography variant="body1"><b>Résultat du check</b> : {result.passed ? 'Réussi' : 'Échoué'}</Typography>
                                                         <Typography variant="body1"><b>Logs</b> : </Typography>
                                                         {result.log.map((line) => (
                                                             <Typography sx={{ml: 2}} variant="body1">- {line}</Typography>
                                                         ))}
                                                     </Grid>
+                                                    <Grid item xs={12}>
+                                                        <Divider/>
+                                                    </Grid>
                                                 </>
                                             ))}
-                                            {project.jsonResults && JSON.parse(project.jsonResults).error &&
-                                                <Typography>Error : {JSON.parse(project.jsonResults).error.value}</Typography>
+                                            {project.style50Results && !JSON.parse(project.style50Results).error && JSON.parse(project.style50Results).files.map((file) => (
+                                                <>
+                                                    <Grid item sx={{mt: 2}} xs={5} textAlign={"right"}>
+                                                        <Typography variant="h5" color={file.score === 1 ? "success.main" : file.score > 0.5 ? "warning.main" : "error.main"}>Style : {file.name}</Typography>
+                                                    </Grid>
+                                                    <Grid item sx={{mt: 2}} xs={7} textAlign={"left"}>
+                                                        <Typography variant="body1"><b>Score</b> : {file.score}</Typography>
+                                                        {file.comments &&
+                                                            <Typography variant="body1"><b>Commentaire</b> : il devrait y avoir plus de commentaires</Typography>
+                                                        }
+                                                        <Typography variant="body1"><b>Fichier avec éventuelles corrections</b> : </Typography>
+                                                        <div dangerouslySetInnerHTML={{__html: file.diff}}/>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <Divider/>
+                                                    </Grid>
+                                                </>
+                                            ))}
+                                            {project.check50Results && JSON.parse(project.check50Results).error &&
+                                                <Typography>Error : {JSON.parse(project.check50Results).error.value}</Typography>
                                             }
                                         </Grid>
                                     </AccordionDetails>
