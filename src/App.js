@@ -24,6 +24,7 @@ import AdministrationPage from "./pages/AdministrationPage";
 import EvaluationsPage from "./pages/EvaluationsPage";
 import CreerEvaluationPage from "./pages/CreerEvaluationPage";
 import EvaluationRendusPage from "./pages/EvaluationRendusPage";
+import Apropos from "./pages/Apropos";
 
 // ----------------------------------------------------------------------
 
@@ -49,6 +50,7 @@ export default function App() {
                         <Route exact path="evaluations/:uuid" element={<EvaluationRendusPage/>}/>
                         <Route exact path="administration" element={<AdministrationPage/>}/>
                         <Route exact path="compte" element={<UserPage/>}/>
+                        <Route exact path="about" element={<Apropos/>}/>
                     </Route>
                 </Route>
                 <Route path="/assessment/:uuid" element={<UploadPage/>}/>

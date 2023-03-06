@@ -31,6 +31,12 @@ const navConfig = [
         icon: icon('user', 'png'),
         auth: 'ROLE_USER'
     },
+    {
+        title: 'À propos',
+        path: '/app/about',
+        icon: icon('about', 'png'),
+        auth: 'ROLE_USER'
+    },
 ];
 
 export default navConfig;
