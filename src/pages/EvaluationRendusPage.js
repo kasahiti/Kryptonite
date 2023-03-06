@@ -65,7 +65,6 @@ export default function EvaluationRendusPage() {
         axios(config)
             .then(response => {
                 setStudentProjects(response.data)
-                console.log(response.data)
             })
             .catch(error => {
                 console.log(error);
@@ -73,9 +72,19 @@ export default function EvaluationRendusPage() {
     }
 
     const getByUUID = () => {
-        axios.get(`${baseAPI}/assessments/${uuid}`)
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${baseAPI}/assessments/${uuid}`,
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            },
+        };
+
+        axios(config)
             .then(response => {
-                setEvalName(response.data)
+                console.log(response.data)
+                setEvalName(response.data.name)
             })
             .catch(error => {
                 console.error(error);

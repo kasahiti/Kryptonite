@@ -99,7 +99,7 @@ export default function UploadPage() {
     };
 
     const getByUUID = () => {
-        axios.get(`${baseAPI}/assessments/${uuid}`)
+        axios.get(`${baseAPI}/public/assessments/${uuid}`)
             .then(response => {
                 setEvalName(response.data)
                 setErrorUuid(false);

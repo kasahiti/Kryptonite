@@ -52,4 +52,10 @@ public class AssessmentService {
 
         return uuid;
     }
+
+    public void modify(Assessment assessment, MultipartFile file) throws Exception {
+        var correction = new String(file.getBytes());
+        storageService.createCheck50Dir(assessment.getUuid(), correction);
+        assessment.setCorrection(correction);
+    }
 }

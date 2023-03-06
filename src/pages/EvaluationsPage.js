@@ -145,7 +145,7 @@ export default function EvaluationsPage() {
                                                 <TableCell align="right">{row.language}</TableCell>
                                                 <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/assessment/${row.uuid}`} target="_blank" rel="noreferrer">{row.uuid}</a></TableCell>
                                                 <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/app/evaluations/${row.uuid}`}><Fab size="medium" color="secondary" aria-label="edit"><VisibilityIcon /></Fab></a></TableCell>
-                                                <TableCell align="center"><Button variant="contained" color="primary">Modifier</Button></TableCell>
+                                                <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/app/assessment/${row.uuid}`} rel="noreferrer"><Button variant="contained" color="primary">Modifier</Button></a></TableCell>
                                                 <TableCell align="center"><Button color="error" onClick={() => deleteAssessment(row.uuid)}>Supprimer</Button></TableCell>
                                             </TableRow>
                                         ))}

@@ -1,9 +1,8 @@
 package ch.hesge.kryptonite.controllers;
 
-import ch.hesge.kryptonite.domain.Assessment;
-import ch.hesge.kryptonite.domain.Role;
-import ch.hesge.kryptonite.domain.StudentProject;
-import ch.hesge.kryptonite.domain.User;
+import ch.hesge.kryptonite.domain.*;
+import ch.hesge.kryptonite.jobs.JobStatus;
+import ch.hesge.kryptonite.payload.request.AssessmentModificationRequest;
 import ch.hesge.kryptonite.repositories.AssessmentRepository;
 import ch.hesge.kryptonite.services.AssessmentService;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +51,55 @@ public class AssessmentController {
         return ResponseEntity.ok().body(uuid);
     }
 
-    @GetMapping("/{uuid}")
-    public ResponseEntity<String> getAssessmentByUUID(@PathVariable String uuid) {
+    @PutMapping("/{uuid}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<String> modifyAssessment(
+            @PathVariable String uuid,
+            @RequestParam("name") String name,
+            @RequestParam("language") Language language,
+            @RequestParam("correction") MultipartFile file) throws Exception {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
-        return ResponseEntity.ok().body(assessment.getName());
+
+        if(!user.getRole().equals(Role.ROLE_ADMIN) || !assessment.getUser().equals(user)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to modify this resource!");
+        }
+
+        if(!name.isEmpty()) assessment.setName(name);
+        if(language != null) assessment.setLanguage(language);
+
+        if(!file.isEmpty()){
+            service.modify(assessment, file);
+        }
+
+        // Set all jobs status to NOT_STARTED to restart all jobs
+        restartAllJobs(assessment);
+
+        repository.save(assessment);
+        return ResponseEntity.ok().body("Assessment modified successfully!");
+    }
+
+    @PostMapping("/{uuid}/restart")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<String> restartAssessmentJobs(@PathVariable String uuid) {
+        Assessment assessment = repository.findByUuid(uuid).orElseThrow();
+        restartAllJobs(assessment);
+        repository.save(assessment);
+
+        return ResponseEntity.ok().body("All jobs reloaded for this assessment!");
+    }
+
+    @GetMapping("/{uuid}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<?> getAssessment(@PathVariable String uuid) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Assessment assessment = repository.findByUuid(uuid).orElseThrow();
+
+        if(!user.getRole().equals(Role.ROLE_ADMIN) || !assessment.getUser().equals(user)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to access this resource!");
+        }
+
+        return ResponseEntity.ok().body(assessment);
     }
 
     /**
@@ -109,5 +153,13 @@ public class AssessmentController {
         }
 
         return ResponseEntity.ok().body("Assessment deleted successfully!");
+    }
+
+    public void restartAllJobs(Assessment assessment) {
+        assessment.getStudentProjects().forEach(studentProject -> {
+            studentProject.setStatus(JobStatus.NOT_STARTED);
+            studentProject.setCheck50Results("");
+            studentProject.setStyle50Results("");
+        });
     }
 }

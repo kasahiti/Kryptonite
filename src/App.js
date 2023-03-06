@@ -25,6 +25,7 @@ import EvaluationsPage from "./pages/EvaluationsPage";
 import CreerEvaluationPage from "./pages/CreerEvaluationPage";
 import EvaluationRendusPage from "./pages/EvaluationRendusPage";
 import Apropos from "./pages/Apropos";
+import ModifierEvaluationPage from "./pages/ModifierEvaluationPage";
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +47,7 @@ export default function App() {
                     <Route exact path="/app" element={<DashboardLayout/>}>
                         <Route element={<Navigate to="/app/evaluations"/>} index/>
                         <Route exact path="assessment" element={<CreerEvaluationPage/>}/>
+                        <Route exact path="assessment/:uuid" element={<ModifierEvaluationPage/>}/>
                         <Route exact path="evaluations" element={<EvaluationsPage/>}/>
                         <Route exact path="evaluations/:uuid" element={<EvaluationRendusPage/>}/>
                         <Route exact path="administration" element={<AdministrationPage/>}/>

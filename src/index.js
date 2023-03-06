@@ -90,7 +90,7 @@ const UserProvider = ({children}) => {
         });
         
         const config = {
-            method: 'post',
+            method: 'put',
             maxBodyLength: Infinity,
             url: `${baseAPI}/users/${id}`,
             headers: {
