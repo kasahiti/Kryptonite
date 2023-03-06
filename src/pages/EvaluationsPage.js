@@ -24,8 +24,8 @@ const Alert = forwardRef((props, ref) => {
 });
 
 
-function createData(name, language, uuid) {
-    return { name, language, uuid };
+function createData(name, language, uuid, user) {
+    return { name, language, uuid, user};
 }
 
 export default function EvaluationsPage() {
@@ -90,7 +90,7 @@ export default function EvaluationsPage() {
 
                 // eslint-disable-next-line no-plusplus
                 for(let i = 0; i < response.data.length; i++) {
-                    localRows.push(createData(response.data[i].name, response.data[i].language, response.data[i].uuid))
+                    localRows.push(createData(response.data[i].name, response.data[i].language, response.data[i].uuid, response.data[i].user.email))
                 }
 
                 setRows(localRows)
@@ -126,7 +126,10 @@ export default function EvaluationsPage() {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Nom</TableCell>
-                                            <TableCell align="right">Language</TableCell>
+                                            <TableCell align="left">Language</TableCell>
+                                            {user.role.includes("ADMIN") &&
+                                                <TableCell align="left">Utilisateur</TableCell>
+                                            }
                                             <TableCell align="center">URL Publique / UUID</TableCell>
                                             <TableCell align="center">Rendus</TableCell>
                                             <TableCell align="center">Modifier</TableCell>
@@ -142,7 +145,12 @@ export default function EvaluationsPage() {
                                                 <TableCell component="th" scope="row">
                                                     {row.name}
                                                 </TableCell>
-                                                <TableCell align="right">{row.language}</TableCell>
+                                                <TableCell align="left">{row.language}</TableCell>
+                                                {user.role.includes("ADMIN") &&
+                                                    <TableCell component="th" scope="row">
+                                                        {row.user}
+                                                    </TableCell>
+                                                }
                                                 <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/assessment/${row.uuid}`} target="_blank" rel="noreferrer">{row.uuid}</a></TableCell>
                                                 <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/app/evaluations/${row.uuid}`}><Fab size="medium" color="secondary" aria-label="edit"><VisibilityIcon /></Fab></a></TableCell>
                                                 <TableCell align="center"><a href={`${window.location.protocol}//${window.location.host}/app/assessment/${row.uuid}`} rel="noreferrer"><Button variant="contained" color="primary">Modifier</Button></a></TableCell>

@@ -220,6 +220,9 @@ export default function EvaluationRendusPage() {
                                     </AccordionDetails>
                                 </Accordion>
                                 ))}
+                            {studentProjects.length === 0 &&
+                                <Typography>Il n'y a aucun rendu pour l'instant</Typography>
+                            }
                         </Grid>
                     </Grid>
                 </Stack>

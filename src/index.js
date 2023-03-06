@@ -88,7 +88,7 @@ const UserProvider = ({children}) => {
             "role": role,
             "password": newPassword
         });
-        
+
         const config = {
             method: 'put',
             maxBodyLength: Infinity,
@@ -103,7 +103,13 @@ const UserProvider = ({children}) => {
         return axios(config)
             .then((response) => {
                 if(response.data.token !== undefined) {
-                    localStorage.setItem('user', JSON.stringify({...user, firstName: fName, lastName: lName, email: newMail, token: response.data.token}));
+                    localStorage.setItem('user',
+                        JSON.stringify({
+                            ...user,
+                            firstName: response.data.firstName,
+                            lastName: response.data.lastName,
+                            email: response.data.email,
+                            token: response.data.token}));
                     setUser(JSON.parse(localStorage.getItem('user')));
                 }
                 return true;

@@ -106,7 +106,7 @@ export default function UserPage() {
         if (newPassword !== newPasswordConf) {
             openSnack("error", "Les novueaux mots de passes ne correpondent pas!");
         } else {
-            modifyDetails(null, null, user.email, null, newPassword, user.id)
+            modifyDetails(null, null, user.email, null, newPassword, null, user.id)
                 .then((res) => {
                     if (res) {
                         setOpen(false);

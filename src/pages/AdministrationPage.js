@@ -194,8 +194,8 @@ export default function AdministrationPage() {
         setLastName('');
         setEmail('');
         setRole('');
-        setNewPasswordConf('');
-        setNewPassword('');
+        setNewPasswordConf(null);
+        setNewPassword(null);
         setDialogOpen(false);
         setDialogModifyOpen(false);
     };
@@ -258,8 +258,8 @@ export default function AdministrationPage() {
                     setFirstName("");
                     setLastName("");
                     setEmail("");
-                    setNewPassword("");
-                    setNewPasswordConf("");
+                    setNewPassword(null);
+                    setNewPasswordConf(null);
                     setDialogOpen(false);
                     openSnack("success", "L'utilisateur a été créé avec succès !");
                     fetchUsers();
@@ -274,12 +274,13 @@ export default function AdministrationPage() {
         if(newPasswordConf !== newPassword) {
             openSnack("error", "Les nouveaux mots de passes ne correspondent pas !");
         } else {
-            modifyDetails(firstName, lastName, selectedUser.email, email, newPasswordConf, role, selectedUser.id)
+            const pwd = newPasswordConf.length > 0 ? newPasswordConf : null;
+            modifyDetails(firstName, lastName, selectedUser.email, email, pwd, role, selectedUser.id)
                 .then((res) => {
                     if (res) {
                         setOpen(false);
-                        setNewPassword('');
-                        setNewPasswordConf('');
+                        setNewPassword(null);
+                        setNewPasswordConf(null);
                         openSnack("success", "L'utilisateur a bien été modifié !")
                         handleCancelDialog();
                         fetchUsers();
@@ -477,7 +478,7 @@ export default function AdministrationPage() {
                                 <TextField
                                     fullWidth
                                     required
-                                    label="Email"
+                                    label="Email / Nom d'utilisateur"
                                     value={email}
                                     onChange={(evt) => setEmail(evt.target.value)}
                                 />
@@ -556,7 +557,7 @@ export default function AdministrationPage() {
                                 <TextField
                                     fullWidth
                                     required
-                                    label="Email"
+                                    label="Email / Nom d'utilisateur"
                                     value={email}
                                     onChange={(evt) => setEmail(evt.target.value)}
                                 />

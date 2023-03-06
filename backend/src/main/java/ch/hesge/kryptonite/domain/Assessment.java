@@ -25,7 +25,6 @@ public class Assessment {
     @ToString.Exclude
     @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "assessment", cascade = CascadeType.ALL, orphanRemoval = true)
