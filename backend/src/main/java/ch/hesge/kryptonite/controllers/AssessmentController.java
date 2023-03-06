@@ -61,7 +61,7 @@ public class AssessmentController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
 
-        if(!user.getRole().equals(Role.ROLE_ADMIN) || !assessment.getUser().equals(user)) {
+        if(!user.getRole().equals(Role.ROLE_ADMIN) && !assessment.getUser().equals(user)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to modify this resource!");
         }
 
@@ -95,7 +95,7 @@ public class AssessmentController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
 
-        if(!user.getRole().equals(Role.ROLE_ADMIN) || !assessment.getUser().equals(user)) {
+        if(!user.getRole().equals(Role.ROLE_ADMIN) && !user.equals(assessment.getUser())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to access this resource!");
         }
 
