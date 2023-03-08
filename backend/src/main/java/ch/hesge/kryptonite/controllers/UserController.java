@@ -28,6 +28,14 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+
+    /**
+     * Modifies a user with the given ID using the fields specified in the UserModificationRequest and returns a ResponseEntity.
+     *
+     * @param request a UserModificationRequest object containing the fields to modify
+     * @param id      the ID of the user to modify
+     * @return a ResponseEntity with a success message or an unauthorized status if the user is not allowed to modify the user
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<?> modifyUser(@RequestBody UserModificationRequest request, @PathVariable Integer id) {
@@ -36,13 +44,13 @@ public class UserController {
         boolean same = loggedInUser.equals(userToChange);
 
         if (loggedInUser.getRole().equals(Role.ROLE_ADMIN) || loggedInUser.equals(userToChange)) {
-            if(request.getFirstName() != null) userToChange.setFirstName(request.getFirstName());
-            if(request.getLastName() != null) userToChange.setLastName(request.getLastName());
-            if(request.getNewEmail() != null) userToChange.setEmail(request.getNewEmail());
-            if(request.getPassword() != null) userToChange.setPassword(passwordEncoder.encode(request.getPassword()));
-            if(request.getRole() != null) userToChange.setRole(request.getRole());
+            if (request.getFirstName() != null) userToChange.setFirstName(request.getFirstName());
+            if (request.getLastName() != null) userToChange.setLastName(request.getLastName());
+            if (request.getNewEmail() != null) userToChange.setEmail(request.getNewEmail());
+            if (request.getPassword() != null) userToChange.setPassword(passwordEncoder.encode(request.getPassword()));
+            if (request.getRole() != null) userToChange.setRole(request.getRole());
             userRepository.save(userToChange);
-            if(same) {
+            if (same) {
                 return ResponseEntity.ok().body(service.authenticate(userToChange));
             } else {
                 return ResponseEntity.ok().body("User changed successfully!");
@@ -65,9 +73,16 @@ public class UserController {
         return ResponseEntity.ok().body(users);
     }
 
+
+    /**
+     * Deletes the user with the given ID.
+     *
+     * @param id the ID of the user to delete
+     * @return a ResponseEntity with a success message or an unauthorized status if the user is not allowed to delete the user
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer id){
+    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
         User user = userRepository.findById(id).orElseThrow();
         userRepository.delete(user);
         return ResponseEntity.ok().body("User deleted successfully!");

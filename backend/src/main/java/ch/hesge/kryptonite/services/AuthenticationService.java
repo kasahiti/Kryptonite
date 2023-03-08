@@ -1,6 +1,5 @@
 package ch.hesge.kryptonite.services;
 
-import ch.hesge.kryptonite.domain.Role;
 import ch.hesge.kryptonite.domain.User;
 import ch.hesge.kryptonite.payload.request.AuthenticationRequest;
 import ch.hesge.kryptonite.payload.request.RegisterRequest;
@@ -74,6 +73,13 @@ public class AuthenticationService {
                 .build();
     }
 
+
+    /**
+     * Generates a JWT token for the given User and returns an AuthenticationResponse containing the token and the user's information.
+     *
+     * @param user the User to generate a token for
+     * @return an AuthenticationResponse containing the JWT token and the user's information
+     */
     public AuthenticationResponse authenticate(User user) {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()

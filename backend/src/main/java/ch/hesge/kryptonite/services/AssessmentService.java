@@ -53,6 +53,14 @@ public class AssessmentService {
         return uuid;
     }
 
+
+    /**
+     * Modifies an existing assessment's correction
+     *
+     * @param assessment the Assessment entity to modify
+     * @param file       a MultipartFile containing the new correction string for the assessment
+     * @throws Exception if an error occurs while modifying the assessment's correction
+     */
     public void modify(Assessment assessment, MultipartFile file) throws Exception {
         var correction = new String(file.getBytes());
         storageService.createCheck50Dir(assessment.getUuid(), correction);

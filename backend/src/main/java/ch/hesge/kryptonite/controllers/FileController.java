@@ -11,8 +11,6 @@ import ch.hesge.kryptonite.storage.StorageFileNotFoundException;
 import ch.hesge.kryptonite.storage.StorageService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -41,15 +42,14 @@ public class FileController {
     private final List<String> extensions = Arrays.asList("zip", "rar", "7z");
 
 
-
     /**
      * HTTP endpoint for downloading a project.
      * Sources :
      * * <a href="https://www.codejava.net/java-se/file-io/zip-directories">codejava.net</a>
      * * <a href="https://www.tutorialsbuddy.com/how-to-zip-multiple-files-for-download-in-spring-boot">tutorialsbuddy.com</a>
      *
-     * @param response the http servlet response
-     * @param uuid the uuid of the assessment
+     * @param response  the http servlet response
+     * @param uuid      the uuid of the assessment
      * @param studentId the student id used to locate the folder to zip
      * @return a ResponseEntity containing the zip file
      */
@@ -60,13 +60,14 @@ public class FileController {
         Assessment assessment = assessmentRepository.findByUuid(uuid).orElseThrow();
         Set<StudentProject> projects = assessment.getStudentProjects();
 
-        if (!assessment.getUser().equals(user) && !user.getRole().equals(Role.ROLE_ADMIN) ) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(outputStream -> {});
+        if (!assessment.getUser().equals(user) && !user.getRole().equals(Role.ROLE_ADMIN)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(outputStream -> {
+            });
         }
 
         List<File> files = new ArrayList<>();
 
-        for(StudentProject studentProject : projects) {
+        for (StudentProject studentProject : projects) {
             if (Objects.equals(studentProject.getId(), studentId)) {
                 Collections.addAll(files, Objects.requireNonNull(new File(studentProject.getPathFS()).listFiles()));
             }

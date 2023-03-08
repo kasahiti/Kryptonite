@@ -2,7 +2,6 @@ package ch.hesge.kryptonite.controllers;
 
 import ch.hesge.kryptonite.domain.*;
 import ch.hesge.kryptonite.jobs.JobStatus;
-import ch.hesge.kryptonite.payload.request.AssessmentModificationRequest;
 import ch.hesge.kryptonite.repositories.AssessmentRepository;
 import ch.hesge.kryptonite.services.AssessmentService;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +50,16 @@ public class AssessmentController {
         return ResponseEntity.ok().body(uuid);
     }
 
+    /**
+     * Modifies an assessment with the given UUID, name, language and correction file.
+     *
+     * @param uuid     the UUID of the assessment to modify
+     * @param name     the new name of the assessment, can be empty to not modify
+     * @param language the new language of the assessment, can be null to not modify
+     * @param file     the new correction file of the assessment, can be empty to not modify
+     * @return a ResponseEntity with a success message or an unauthorized status if the user is not allowed to modify the assessment
+     * @throws Exception if there is an error during the modification process
+     */
     @PutMapping("/{uuid}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<String> modifyAssessment(
@@ -61,14 +70,14 @@ public class AssessmentController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
 
-        if(!user.getRole().equals(Role.ROLE_ADMIN) && !assessment.getUser().equals(user)) {
+        if (!user.getRole().equals(Role.ROLE_ADMIN) && !assessment.getUser().equals(user)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to modify this resource!");
         }
 
-        if(!name.isEmpty()) assessment.setName(name);
-        if(language != null) assessment.setLanguage(language);
+        if (!name.isEmpty()) assessment.setName(name);
+        if (language != null) assessment.setLanguage(language);
 
-        if(!file.isEmpty()){
+        if (!file.isEmpty()) {
             service.modify(assessment, file);
         }
 
@@ -79,6 +88,13 @@ public class AssessmentController {
         return ResponseEntity.ok().body("Assessment modified successfully!");
     }
 
+
+    /**
+     * Restarts all jobs for the assessment with the given UUID.
+     *
+     * @param uuid the UUID of the assessment to restart jobs for
+     * @return a ResponseEntity with a success message or an unauthorized status if the user is not allowed to restart jobs for the assessment
+     */
     @PostMapping("/{uuid}/restart")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<String> restartAssessmentJobs(@PathVariable String uuid) {
@@ -89,13 +105,20 @@ public class AssessmentController {
         return ResponseEntity.ok().body("All jobs reloaded for this assessment!");
     }
 
+
+    /**
+     * Retrieves the assessment with the given UUID and returns it as a ResponseEntity.
+     *
+     * @param uuid the UUID of the assessment to retrieve
+     * @return a ResponseEntity containing the assessment as its body or an unauthorized status if the user is not allowed to access the assessment
+     */
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<?> getAssessment(@PathVariable String uuid) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Assessment assessment = repository.findByUuid(uuid).orElseThrow();
 
-        if(!user.getRole().equals(Role.ROLE_ADMIN) && !user.equals(assessment.getUser())) {
+        if (!user.getRole().equals(Role.ROLE_ADMIN) && !user.equals(assessment.getUser())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to access this resource!");
         }
 
@@ -138,6 +161,13 @@ public class AssessmentController {
         }
     }
 
+
+    /**
+     * Deletes the assessment with the given UUID.
+     *
+     * @param uuid the UUID of the assessment to delete
+     * @return a ResponseEntity with a success message or an unauthorized status if the user is not allowed to delete the assessment
+     */
     @DeleteMapping("/{uuid}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<String> deleteAssessment(@PathVariable String uuid) {
@@ -155,6 +185,12 @@ public class AssessmentController {
         return ResponseEntity.ok().body("Assessment deleted successfully!");
     }
 
+
+    /**
+     * Restarts all jobs for the given assessment by setting all student projects' status to NOT_STARTED and clearing the check50 and style50 results.
+     *
+     * @param assessment the assessment to restart jobs for
+     */
     public void restartAllJobs(Assessment assessment) {
         assessment.getStudentProjects().forEach(studentProject -> {
             studentProject.setStatus(JobStatus.NOT_STARTED);
